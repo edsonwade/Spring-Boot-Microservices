@@ -90,77 +90,83 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>4.6.1</version>
         </dependency>
-      <!--  <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
+        <!--  <dependency>
+              <groupId>org.springframework.kafka</groupId>
+              <artifactId>spring-kafka</artifactId>
+          </dependency>
 
+          <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-starter-data-mongodb</artifactId>
+          </dependency>
+          <dependency>
+              <groupId>org.mariadb.jdbc</groupId>
+              <artifactId>mariadb-java-client</artifactId>
+              <scope>runtime</scope>
+          </dependency>
+          <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-starter-amqp</artifactId>
+          </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+               <groupId>org.springframework.amqp</groupId>
+               <artifactId>spring-rabbit-test</artifactId>
+               <scope>test</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.springframework.kafka</groupId>
+               <artifactId>spring-kafka-test</artifactId>
+               <scope>test</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.testcontainers</groupId>
+               <artifactId>junit-jupiter</artifactId>
+               <scope>test</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.testcontainers</groupId>
+               <artifactId>kafka</artifactId>
+               <scope>test</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.testcontainers</groupId>
+               <artifactId>mariadb</artifactId>
+               <scope>test</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.testcontainers</groupId>
+               <artifactId>mongodb</artifactId>
+               <scope>test</scope>
+           </dependency>
+
+           <dependency>
+               <groupId>org.testcontainers</groupId>
+               <artifactId>rabbitmq</artifactId>
+               <scope>test</scope>
+           </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-      <dependency>
-             <groupId>org.springframework.amqp</groupId>
-             <artifactId>spring-rabbit-test</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.springframework.kafka</groupId>
-             <artifactId>spring-kafka-test</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>junit-jupiter</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>kafka</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>mariadb</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>mongodb</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>mysql</artifactId>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.testcontainers</groupId>
-             <artifactId>rabbitmq</artifactId>
-             <scope>test</scope>
-         </dependency>
-     </dependencies>
-     <dependencyManagement>
-         <dependencies>
-             <dependency>
-                 <groupId>org.testcontainers</groupId>
-                 <artifactId>testcontainers-bom</artifactId>
-                 <version>${testcontainers.version}</version>
-                 <type>pom</type>
-                 <scope>import</scope>
-             </dependency>
-         </dependencies>
-     </dependencyManagement>-->
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency> -->
     </dependencies>
+
+    <!--<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>-->
+
 
     <build>
         <plugins>
