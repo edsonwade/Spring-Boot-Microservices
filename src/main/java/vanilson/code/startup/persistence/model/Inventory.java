@@ -4,47 +4,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_order_line_item")
-public class OrderLineItem implements Serializable {
+@Table(name = "tb_inventory")
+public class Inventory implements Serializable {
 
     private static final Long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_items_id",
+    @Column(name = "inventory_id",
             nullable = false,
             length = 11)
     @JsonProperty("id")
-    private Integer order_items_id;
-    @Column(name = "sku_code ",
+    private Integer inventory_id;
+    @Column(name = "sku_code",
             nullable = false,
             length = 250)
     private String skuCode;
-    @Column(nullable = false,
-            precision = 6,
-            scale = 2)
-    private BigDecimal price;
 
     private Integer quantity;
 
-    public OrderLineItem() {
+    public Inventory() {
     }
 
-    public OrderLineItem(String skuCode, BigDecimal price, Integer quantity) {
+    public Inventory(String skuCode, Integer quantity) {
         this.skuCode = skuCode;
-        this.price = price;
         this.quantity = quantity;
     }
 
-    public Integer getOrder_items_id() {
-        return order_items_id;
+    public Integer getInventory_id() {
+        return inventory_id;
     }
 
-    public void setOrder_items_id(Integer order_items_id) {
-        this.order_items_id = order_items_id;
+    public void setInventory_id(Integer inventory_id) {
+        this.inventory_id = inventory_id;
     }
 
     public String getSkuCode() {
@@ -53,14 +47,6 @@ public class OrderLineItem implements Serializable {
 
     public void setSkuCode(String skuCode) {
         this.skuCode = skuCode;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public Integer getQuantity() {
@@ -75,24 +61,22 @@ public class OrderLineItem implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OrderLineItem that = (OrderLineItem) o;
-        return Objects.equals(order_items_id, that.order_items_id) &&
-                Objects.equals(skuCode, that.skuCode) &&
-                Objects.equals(price, that.price) &&
-                Objects.equals(quantity, that.quantity);
+        Inventory inventory = (Inventory) o;
+        return Objects.equals(inventory_id, inventory.inventory_id) &&
+                Objects.equals(skuCode, inventory.skuCode) &&
+                Objects.equals(quantity, inventory.quantity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(order_items_id, skuCode, price, quantity);
+        return Objects.hash(inventory_id, skuCode, quantity);
     }
 
     @Override
     public String toString() {
-        return "OrderLineItem{" +
-                "order_items_id=" + order_items_id +
+        return "Inventory{" +
+                "inventory_id=" + inventory_id +
                 ", skuCode='" + skuCode + '\'' +
-                ", price=" + price +
                 ", quantity=" + quantity +
                 '}';
     }
