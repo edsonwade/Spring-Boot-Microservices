@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "name": "Headphones",
   "description": "Beat By Dre",
-  "price":50.99
+  "price": 50.99
 }
 
 ### Return all product records
@@ -13,5 +13,23 @@ GET http://localhost:8080/api/v1/product
 
 ### Get product By Id
 GET http://localhost:8080/api/v1/product/11
+
+###
+GET http://localhost:8080/api/v1/order
+
+###
+### Send POST request with json body
+POST http://localhost:8080/api/v1/order/create
+Content-Type: application/json
+
+{
+  "orderLineItemDTOList": [
+    {
+      "skuCode": "HPS",
+      "price": 1200.99,
+      "quantity": 3
+    }
+  ]
+}
 
 ###
