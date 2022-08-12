@@ -1,7 +1,6 @@
 package vanilson.code.startup.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "tb_order")
-@JsonPropertyOrder({"id", "name", "description", "price"})
 @Builder
 public class Order implements Serializable {
 
