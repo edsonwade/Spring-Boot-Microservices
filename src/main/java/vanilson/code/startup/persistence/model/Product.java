@@ -1,6 +1,8 @@
 package vanilson.code.startup.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +11,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tb_product")
+@JsonPropertyOrder({"id", "name", "description", "price"})
+@Builder
 public class Product implements Serializable {
 
     private static final Long serialVersionUID = 1L;
