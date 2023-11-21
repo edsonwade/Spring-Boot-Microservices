@@ -1,2 +1,3 @@
-# Spring_Boot_Microservices_2022
+# Spring Boot Microservices 2023
 Spring Boot Microservices
+RabbitMQ
