@@ -1,0 +1,67 @@
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/departments")
+public class DepartmentController {
+
+    private final DepartmentService departmentService;
+
+    public DepartmentController(DepartmentService departmentService) {
+        this.departmentService = departmentService;
+    }
+
+    @GetMapping
+    @ApiOperation(value = "Get all departments", notes = "Retrieves all departments.")
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        List<DepartmentDto> departments = departmentService.findAllDepartments();
+        return ResponseEntity.ok(departments);
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation(value = "Get department by ID", notes = "Retrieves a department by its ID.")
+    public ResponseEntity<DepartmentDto> getDepartmentById(
+            @ApiParam(value = "ID of the department to retrieve", example = "1")
+            @PathVariable("id") long departmentId) {
+        DepartmentDto department = departmentService.findDepartmentById(departmentId);
+        return ResponseEntity.ok(department);
+    }
+
+    @PostMapping
+    @ApiOperation(value = "Create new department", notes = "Creates a new department.")
+    public ResponseEntity<DepartmentDto> createDepartment(
+            @ApiParam(value = "Department information", required = true)
+            @Valid @RequestBody DepartmentDto departmentDto) {
+        DepartmentDto savedDepartment = departmentService.saveDepartment(departmentDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
+    }
+
+    @PutMapping("/{id}")
+    @ApiOperation(value = "Update department", notes = "Updates an existing department.")
+    public ResponseEntity<DepartmentDto> updateDepartment(
+            @ApiParam(value = "ID of the department to update", example = "1")
+            @PathVariable("id") long departmentId,
+            @ApiParam(value = "Updated department information", required = true)
+            @Valid @RequestBody DepartmentDto departmentDto) {
+        if (departmentDto.getDepartmentId() != departmentId) {
+            return ResponseEntity.badRequest().build();
+        }
+        DepartmentDto updatedDepartment = departmentService.updateDepartment(departmentDto);
+        return ResponseEntity.ok(updatedDepartment);
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "Delete department", notes = "Deletes a department by its ID.")
+    public ResponseEntity<Void> deleteDepartment(
+            @ApiParam(value = "ID of the department to delete", example = "1")
+            @PathVariable("id") long departmentId) {
+        departmentService.deleteDepartment(departmentId);
+        return ResponseEntity.noContent().build();
+    }
+}

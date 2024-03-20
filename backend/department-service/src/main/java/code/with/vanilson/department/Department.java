@@ -29,6 +29,7 @@ public class Department implements Serializable {
     private String departmentCode;
 
     public Department() {
+        //default constructor
     }
 
     public Department(long departmentId, String departmentName, String departmentDescription, String departmentCode) {

@@ -1,0 +1,152 @@
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import java.util.Collections;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
+public class DepartmentControllerTest {
+
+    @Mock
+    private DepartmentService departmentService;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
+    private DepartmentController departmentController;
+
+    private MockMvc mockMvc;
+
+    @Test
+    public void testGetAllDepartments() throws Exception {
+        when(departmentService.findAllDepartments()).thenReturn(Collections.emptyList());
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(get("/departments"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    public void testGetDepartmentById() throws Exception {
+        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.findDepartmentById(anyLong())).thenReturn(departmentDto);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(get("/departments/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+    }
+
+    @Test
+    public void testCreateDepartment() throws Exception {
+        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.saveDepartment(any())).thenReturn(departmentDto);
+        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(departmentDto);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(post("/departments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"departmentName\":\"IT\",\"departmentDescription\":\"Information Technology\",\"departmentCode\":\"IT-001\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+    }
+
+    @Test
+    public void testUpdateDepartment() throws Exception {
+        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.updateDepartment(any())).thenReturn(departmentDto);
+        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(departmentDto);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(put("/departments/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"departmentId\":1,\"departmentName\":\"IT\",\"departmentDescription\":\"Information Technology\",\"departmentCode\":\"IT-001\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+    }
+
+    @Test
+    public void testDeleteDepartment() throws Exception {
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(delete("/departments/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testUpdateDepartment_WhenDepartmentNotFound() throws Exception {
+        when(departmentService.updateDepartment(any())).thenThrow(new DepartmentNotFoundException("Department with ID 1 not found"));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(put("/departments/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"departmentId\":1,\"departmentName\":\"IT\",\"departmentDescription\":\"Information Technology\",\"departmentCode\":\"IT-001\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Department with ID 1 not found"));
+    }
+
+    @Test
+    public void testGetDepartmentById_WhenDepartmentNotFound() throws Exception {
+        when(departmentService.findDepartmentById(anyLong())).thenThrow(new DepartmentNotFoundException("Department with ID 1 not found"));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(get("/departments/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Department with ID 1 not found"));
+    }
+
+    private String toJson(Object object) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(object);
+    }
+
+    @Test
+    public void testCreateDepartment() throws Exception {
+        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+
+        when(departmentService.saveDepartment(any(DepartmentDto.class))).thenReturn(departmentDto);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+        mockMvc.perform(post("/departments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(departmentDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.departmentId").value(1))
+                .andExpect(jsonPath("$.departmentName").value("IT"))
+                .andExpect(jsonPath("$.departmentDescription").value("Information Technology"))
+                .andExpect(jsonPath("$.departmentCode").value("IT-001"));
+    }
+
+
+}

@@ -1,0 +1,101 @@
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+public class DepartmentServiceImplTest {
+
+    @Mock
+    private DepartmentRepository departmentRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
+    private DepartmentServiceImpl departmentService;
+
+    @Test
+    public void testSaveDepartment() {
+        // Mocking data
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setDepartmentName("Test Department");
+
+        Department department = new Department();
+        department.setDepartmentName("Test Department");
+
+        // Mocking behavior
+        when(modelMapper.map(departmentDto, Department.class)).thenReturn(department);
+        when(departmentRepository.save(department)).thenReturn(department);
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+
+        // Test
+        DepartmentDto savedDepartment = departmentService.saveDepartment(departmentDto);
+
+        assertNotNull(savedDepartment);
+        assertEquals("Test Department", savedDepartment.getDepartmentName());
+    }
+
+    @Test
+    public void testFindAllDepartments() {
+        // Mocking data
+        Department department = new Department();
+        department.setDepartmentName("Test Department");
+
+        // Mocking behavior
+        when(departmentRepository.findAll()).thenReturn(Collections.singletonList(department));
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(new DepartmentDto());
+
+        // Test
+        assertEquals(1, departmentService.findAllDepartments().size());
+    }
+
+    @Test
+    public void testFindDepartmentById() {
+        // Mocking data
+        Department department = new Department();
+        department.setDepartmentId(1L);
+        department.setDepartmentName("Test Department");
+
+        // Mocking behavior
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(new DepartmentDto());
+
+        // Test
+        assertNotNull(departmentService.findDepartmentById(1L));
+    }
+
+    @Test
+    public void testUpdateDepartment() {
+        // Mocking data
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setDepartmentId(1L);
+        departmentDto.setDepartmentName("Test Department");
+
+        Department department = new Department();
+        department.setDepartmentId(1L);
+        department.setDepartmentName("Test Department");
+
+        // Mocking behavior
+        when(departmentRepository.existsById(1L)).thenReturn(true);
+        when(modelMapper.map(departmentDto, Department.class)).thenReturn(department);
+        when(departmentRepository.save(department)).thenReturn(department);
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+
+        // Test
+        assertNotNull(departmentService.updateDepartment(departmentDto));
+    }
+
+    @Test
+    public void testDeleteDepartment() {
+        // Test
+        assertDoesNotThrow(() -> departmentService.deleteDepartment(1L));
+    }
+}
