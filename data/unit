@@ -25,19 +25,19 @@ public class DepartmentServiceImplTest {
     @Test
     public void testSaveDepartment() {
         // Mocking data
-        DepartmentDto departmentDto = new DepartmentDto();
-        departmentDto.setDepartmentName("Test Department");
+        DepartmentDto employeeDto = new DepartmentDto();
+        employeeDto.setDepartmentName("Test Department");
 
         Department department = new Department();
         department.setDepartmentName("Test Department");
 
         // Mocking behavior
-        when(modelMapper.map(departmentDto, Department.class)).thenReturn(department);
+        when(modelMapper.map(employeeDto, Department.class)).thenReturn(department);
         when(departmentRepository.save(department)).thenReturn(department);
-        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(employeeDto);
 
         // Test
-        DepartmentDto savedDepartment = departmentService.saveDepartment(departmentDto);
+        DepartmentDto savedDepartment = departmentService.saveDepartment(employeeDto);
 
         assertNotNull(savedDepartment);
         assertEquals("Test Department", savedDepartment.getDepartmentName());
@@ -75,9 +75,9 @@ public class DepartmentServiceImplTest {
     @Test
     public void testUpdateDepartment() {
         // Mocking data
-        DepartmentDto departmentDto = new DepartmentDto();
-        departmentDto.setDepartmentId(1L);
-        departmentDto.setDepartmentName("Test Department");
+        DepartmentDto employeeDto = new DepartmentDto();
+        employeeDto.setDepartmentId(1L);
+        employeeDto.setDepartmentName("Test Department");
 
         Department department = new Department();
         department.setDepartmentId(1L);
@@ -85,12 +85,12 @@ public class DepartmentServiceImplTest {
 
         // Mocking behavior
         when(departmentRepository.existsById(1L)).thenReturn(true);
-        when(modelMapper.map(departmentDto, Department.class)).thenReturn(department);
+        when(modelMapper.map(employeeDto, Department.class)).thenReturn(department);
         when(departmentRepository.save(department)).thenReturn(department);
-        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(departmentDto);
+        when(modelMapper.map(department, DepartmentDto.class)).thenReturn(employeeDto);
 
         // Test
-        assertNotNull(departmentService.updateDepartment(departmentDto));
+        assertNotNull(departmentService.updateDepartment(employeeDto));
     }
 
     @Test

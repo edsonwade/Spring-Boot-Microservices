@@ -111,15 +111,15 @@ public class DepartmentController {
     /**
      * Creates a new department.
      *
-     * @param departmentDto The DTO representing the department to be created.
+     * @param employeeDto The DTO representing the department to be created.
      * @return ResponseEntity with DepartmentDto representing the created department.
      */
     @PostMapping("/create-department")
     @ApiOperation(value = "Create new department", notes = "Creates a new department.")
     public ResponseEntity<DepartmentDto> createDepartment(
             @ApiParam(value = "Department information", required = true)
-            @Valid @RequestBody DepartmentDto departmentDto) {
-        DepartmentDto savedDepartment = departmentService.saveDepartment(departmentDto);
+            @Valid @RequestBody DepartmentDto employeeDto) {
+        DepartmentDto savedDepartment = departmentService.saveDepartment(employeeDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
@@ -127,7 +127,7 @@ public class DepartmentController {
      * Updates an existing department.
      *
      * @param departmentId  The ID of the department to update.
-     * @param departmentDto The DTO representing the updated department information.
+     * @param employeeDto The DTO representing the updated department information.
      * @return ResponseEntity with DepartmentDto representing the updated department.
      */
     @PutMapping("/update-department/{id}")
@@ -136,11 +136,11 @@ public class DepartmentController {
             @ApiParam(value = "ID of the department to update", example = "1")
             @PathVariable("id") long departmentId,
             @ApiParam(value = "Updated department information", required = true)
-            @Valid @RequestBody DepartmentDto departmentDto) {
-        if (departmentDto.getDepartmentId() != departmentId) {
+            @Valid @RequestBody DepartmentDto employeeDto) {
+        if (employeeDto.getDepartmentId() != departmentId) {
             return ResponseEntity.badRequest().build();
         }
-        DepartmentDto updatedDepartment = departmentService.updateDepartment(departmentDto);
+        DepartmentDto updatedDepartment = departmentService.updateDepartment(employeeDto);
         return ResponseEntity.ok(updatedDepartment);
     }
 
