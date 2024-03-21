@@ -14,11 +14,14 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentServiceImpl departmentService;
+    private final DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider;
 
     private static final String DEPARTMENT_NOT_FOUND_MESSAGE = "Department with ID %d not found";
 
-    public DepartmentController(DepartmentServiceImpl departmentService) {
+    public DepartmentController(DepartmentServiceImpl departmentService,
+                                DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider) {
         this.departmentService = departmentService;
+        this.exceptionHandlerProvider = exceptionHandlerProvider;
     }
 
     /**
@@ -40,15 +43,12 @@ public class DepartmentController {
      */
     @GetMapping("/{id}")
 
-    public ResponseEntity<?> getDepartmentById(
-            @PathVariable("id") long departmentId) {
+    public ResponseEntity<?> getDepartmentById(@PathVariable("id") long departmentId) {
         try {
             DepartmentDto department = departmentService.findDepartmentById(departmentId);
             return ResponseEntity.ok(department);
         } catch (DepartmentNotFoundException ex) {
-            var errorMessage = String.format(DEPARTMENT_NOT_FOUND_MESSAGE, departmentId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(errorMessage);
+            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
         }
     }
 
@@ -75,20 +75,16 @@ public class DepartmentController {
      */
     @PutMapping("/update-department/{id}")
     public ResponseEntity<?> updateDepartment(
-
-            @PathVariable("id") long departmentId,
-
-            @Valid @RequestBody DepartmentDto departmentDto) {
+            @PathVariable("id") long departmentId, @Valid @RequestBody DepartmentDto departmentDto) {
         if (departmentDto.getDepartmentId() != departmentId) {
-            return ResponseEntity.badRequest().build();
+            return exceptionHandlerProvider.handleDepartmentBadRequest(
+                    new DepartmentBadRequestException("Invalid department ID provided"));
         }
         try {
             DepartmentDto updatedDepartment = departmentService.updateDepartment(departmentDto);
             return ResponseEntity.ok(updatedDepartment);
         } catch (DepartmentNotFoundException ex) {
-            var errorMessage = String.format(DEPARTMENT_NOT_FOUND_MESSAGE, departmentId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(errorMessage);
+            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
         }
     }
 

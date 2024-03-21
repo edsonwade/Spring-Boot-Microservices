@@ -13,6 +13,12 @@
 
     <properties>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>code.with.vanilson</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>
