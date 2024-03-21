@@ -24,3 +24,12 @@ eureka:
 
 server:
   port: 8081
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
