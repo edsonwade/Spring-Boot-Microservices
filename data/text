@@ -41,25 +41,25 @@ public class DepartmentControllerTest {
 
     @Test
     public void testGetDepartmentById() throws Exception {
-        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
-        when(departmentService.findDepartmentById(anyLong())).thenReturn(departmentDto);
+        DepartmentDto employeeDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.findDepartmentById(anyLong())).thenReturn(employeeDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
 
         mockMvc.perform(get("/departments/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
-                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
-                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
-                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+                .andExpect(jsonPath("$.departmentId").value(employeeDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(employeeDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(employeeDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(employeeDto.getDepartmentCode()));
     }
 
     @Test
     public void testCreateDepartment() throws Exception {
-        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
-        when(departmentService.saveDepartment(any())).thenReturn(departmentDto);
-        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(departmentDto);
+        DepartmentDto employeeDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.saveDepartment(any())).thenReturn(employeeDto);
+        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(employeeDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
 
@@ -68,17 +68,17 @@ public class DepartmentControllerTest {
                 .content("{\"departmentName\":\"IT\",\"departmentDescription\":\"Information Technology\",\"departmentCode\":\"IT-001\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
-                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
-                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
-                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+                .andExpect(jsonPath("$.departmentId").value(employeeDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(employeeDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(employeeDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(employeeDto.getDepartmentCode()));
     }
 
     @Test
     public void testUpdateDepartment() throws Exception {
-        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
-        when(departmentService.updateDepartment(any())).thenReturn(departmentDto);
-        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(departmentDto);
+        DepartmentDto employeeDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        when(departmentService.updateDepartment(any())).thenReturn(employeeDto);
+        when(modelMapper.map(any(), eq(DepartmentDto.class))).thenReturn(employeeDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
 
@@ -87,10 +87,10 @@ public class DepartmentControllerTest {
                 .content("{\"departmentId\":1,\"departmentName\":\"IT\",\"departmentDescription\":\"Information Technology\",\"departmentCode\":\"IT-001\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.departmentId").value(departmentDto.getDepartmentId()))
-                .andExpect(jsonPath("$.departmentName").value(departmentDto.getDepartmentName()))
-                .andExpect(jsonPath("$.departmentDescription").value(departmentDto.getDepartmentDescription()))
-                .andExpect(jsonPath("$.departmentCode").value(departmentDto.getDepartmentCode()));
+                .andExpect(jsonPath("$.departmentId").value(employeeDto.getDepartmentId()))
+                .andExpect(jsonPath("$.departmentName").value(employeeDto.getDepartmentName()))
+                .andExpect(jsonPath("$.departmentDescription").value(employeeDto.getDepartmentDescription()))
+                .andExpect(jsonPath("$.departmentCode").value(employeeDto.getDepartmentCode()));
     }
 
     @Test
@@ -132,15 +132,15 @@ public class DepartmentControllerTest {
 
     @Test
     public void testCreateDepartment() throws Exception {
-        DepartmentDto departmentDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
+        DepartmentDto employeeDto = new DepartmentDto(1L, "IT", "Information Technology", "IT-001");
 
-        when(departmentService.saveDepartment(any(DepartmentDto.class))).thenReturn(departmentDto);
+        when(departmentService.saveDepartment(any(DepartmentDto.class))).thenReturn(employeeDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
 
         mockMvc.perform(post("/departments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(departmentDto)))
+                .content(toJson(employeeDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.departmentId").value(1))
                 .andExpect(jsonPath("$.departmentName").value("IT"))
