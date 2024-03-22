@@ -1,8 +1,8 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.controller;
 
-import code.with.vanilson.employee.EmployeeDto;
-import code.with.vanilson.employee.EmployeeNotFoundException;
-import code.with.vanilson.employee.EmployeeServiceImpl;
+import code.with.vanilson.employee.dto.EmployeeDto;
+import code.with.vanilson.employee.exception.EmployeeNotFoundException;
+import code.with.vanilson.employee.service.EmployeeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +10,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static code.with.vanilson.http_codes.EndpointNumberConstant.NOT_FOUND;
+import static code.with.vanilson.util.MessageProvider.getMessage;
+
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
     private final EmployeeServiceImpl employeeService;
 
-    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "Employee with ID %d not found";
-    private static final String EMPLOYEE_EMAIL_NOT_FOUND_MESSAGE = "Employee with ID %s not found";
+    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
 
     public EmployeeController(EmployeeServiceImpl employeeService) {
         this.employeeService = employeeService;
@@ -47,8 +49,8 @@ public class EmployeeController {
             EmployeeDto employee = employeeService.findEmployeeById(employeeId);
             return ResponseEntity.ok(employee);
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = String.format(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            var errorMessage = getMessage(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
+            return ResponseEntity.status(NOT_FOUND)
                     .body(errorMessage);
         }
     }
@@ -66,10 +68,11 @@ public class EmployeeController {
             EmployeeDto employee = employeeService.findEmployeeByEmail(email);
             return ResponseEntity.ok(employee);
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = String.format(EMPLOYEE_EMAIL_NOT_FOUND_MESSAGE, email);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            var errorMessage = getMessage("employee.error.email.not_found", email);
+            return ResponseEntity.status(NOT_FOUND)
                     .body(errorMessage);
         }
+
     }
 
     /**
@@ -104,8 +107,8 @@ public class EmployeeController {
             EmployeeDto updateEmployeeDto = employeeService.updateEmployeeDto(employeeDto);
             return ResponseEntity.ok(updateEmployeeDto);
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = String.format(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            var errorMessage = getMessage(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
+            return ResponseEntity.status(NOT_FOUND)
                     .body(errorMessage);
         }
     }
@@ -123,8 +126,8 @@ public class EmployeeController {
             employeeService.deleteEmployee(employeeId);
             return ResponseEntity.noContent().build();
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = String.format(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            var errorMessage = getMessage(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
+            return ResponseEntity.status(NOT_FOUND)
                     .body(errorMessage);
         }
     }

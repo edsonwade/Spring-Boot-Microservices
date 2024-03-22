@@ -1,4 +1,4 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.exception.handler;
 
 import code.with.vanilson.common.exception.CommonExceptionHandler;
 import code.with.vanilson.common.exception.ErrorResponse;
