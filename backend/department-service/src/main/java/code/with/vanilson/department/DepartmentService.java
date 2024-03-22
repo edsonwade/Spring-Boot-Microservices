@@ -9,6 +9,8 @@ public interface DepartmentService {
 
     DepartmentDto findDepartmentById(long departmentId);
 
+    List<DepartmentDto> saveDepartments(List<DepartmentDto> departmentDtos);
+
     DepartmentDto updateDepartment(DepartmentDto departmentDto);
 
     void deleteDepartment(long departmentId);

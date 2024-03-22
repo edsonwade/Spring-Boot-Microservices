@@ -1,5 +1,6 @@
 package code.with.vanilson.department;
 
+import code.with.vanilson.util.MessageProvider;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,12 +36,6 @@ public class DepartmentController {
         return ResponseEntity.ok(departments);
     }
 
-    /**
-     * Retrieves a department by its ID.
-     *
-     * @param departmentId The ID of the department to retrieve.
-     * @return ResponseEntity with DepartmentDto representing the found department or an error message if the department is not found.
-     */
     @GetMapping("/{id}")
 
     public ResponseEntity<?> getDepartmentById(@PathVariable("id") long departmentId) {
@@ -49,6 +44,8 @@ public class DepartmentController {
             return ResponseEntity.ok(department);
         } catch (DepartmentNotFoundException ex) {
             return exceptionHandlerProvider.handleDepartmentNotFound(ex);
+        } catch (DepartmentBadRequestException ex) {
+            return exceptionHandlerProvider.handleDepartmentBadRequest(ex);
         }
     }
 
@@ -64,6 +61,13 @@ public class DepartmentController {
             @Valid @RequestBody DepartmentDto departmentDto) {
         DepartmentDto savedDepartment = departmentService.saveDepartment(departmentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
+    }
+
+    @PostMapping("/save-departments")
+    public ResponseEntity<List<DepartmentDto>> saveDepartments(@RequestBody List<DepartmentDto> departmentDtos) {
+        List<DepartmentDto> savedDepartments = departmentService.saveDepartments(departmentDtos);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(savedDepartments);
     }
 
     /**

@@ -31,11 +31,11 @@ public final class HttpStatusCodes {
     public static final HttpStatus PERMANENT_REDIRECT = HttpStatus.PERMANENT_REDIRECT;
 
     // 4xx Client Error
-    public static final HttpStatus BAD_REQUEST = HttpStatus.BAD_REQUEST;
+    public static final HttpStatus BAD_REQUEST_STATUS = HttpStatus.BAD_REQUEST;
     public static final HttpStatus UNAUTHORIZED = HttpStatus.UNAUTHORIZED;
     public static final HttpStatus PAYMENT_REQUIRED = HttpStatus.PAYMENT_REQUIRED;
     public static final HttpStatus FORBIDDEN = HttpStatus.FORBIDDEN;
-    public static final HttpStatus NOT_FOUND = HttpStatus.NOT_FOUND;
+    public static final HttpStatus NOT_FOUND_HTTP_STATUS = HttpStatus.NOT_FOUND;
     public static final HttpStatus METHOD_NOT_ALLOWED = HttpStatus.METHOD_NOT_ALLOWED;
     public static final HttpStatus NOT_ACCEPTABLE = HttpStatus.NOT_ACCEPTABLE;
     public static final HttpStatus PROXY_AUTHENTICATION_REQUIRED = HttpStatus.PROXY_AUTHENTICATION_REQUIRED;

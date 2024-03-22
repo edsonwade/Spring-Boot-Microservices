@@ -22,4 +22,11 @@ public class EmployeeExceptionHandler implements CommonExceptionHandler {
                 new ErrorResponse(ex, HttpStatus.BAD_REQUEST, "Europe/Lisbon", HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @Override
+    public ResponseEntity<ErrorResponse> handleNumberException(String ex) {
+        ErrorResponse errorResponse =
+                new ErrorResponse(ex, HttpStatus.BAD_REQUEST, "Europe/Lisbon", HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

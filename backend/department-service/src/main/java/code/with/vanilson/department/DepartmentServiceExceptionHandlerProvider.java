@@ -24,10 +24,17 @@ public class DepartmentServiceExceptionHandlerProvider {
         return commonExceptionHandler.handleNotFoundException(errorMessage);
     }
 
-    @ExceptionHandler(DepartmentNotFoundException.class)
+    @ExceptionHandler(DepartmentBadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> handleDepartmentBadRequest(DepartmentBadRequestException ex) {
-        String errorMessage = ErrorMessageGenerator.generateDepartmentNotFoundMessage(ex.getMessage());
+        String errorMessage = ErrorMessageGenerator.generateDepartmentBadRequestMessage(ex.getMessage());
         return commonExceptionHandler.handleBadRequestException(errorMessage);
+    }
+
+    @ExceptionHandler(DepartmentNumberException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleDepartmentNumberBadRequest(DepartmentNumberException ex) {
+        String errorMessage = ErrorMessageGenerator.generateDepartmentBadRequestMessage(ex.getMessage());
+        return commonExceptionHandler.handleNumberException(errorMessage);
     }
 }

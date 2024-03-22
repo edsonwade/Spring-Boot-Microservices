@@ -1,5 +1,6 @@
 package code.with.vanilson.department;
 
+import code.with.vanilson.util.MessageProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,8 @@ import java.util.Optional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
+    public static final String DEPARTMENT_ERROR_NOT_FOUND = "department.error.not_found";
+
     private final DepartmentRepository departmentRepository;
     private final ModelMapper modelMapper;
 
@@ -48,19 +51,39 @@ public class DepartmentServiceImpl implements DepartmentService {
         return modelMapper.map(savedDepartment, DepartmentDto.class);
     }
 
+    @Override
+    public List<DepartmentDto> saveDepartments(List<DepartmentDto> departmentDtos) {
+        List<Department> departments = departmentDtos.stream()
+                .map(departmentDto -> modelMapper.map(departmentDto, Department.class))
+                .toList();
+
+        // Save the list of Department entities using the repository
+        List<Department> savedDepartments = departmentRepository.saveAll(departments);
+
+        // Map the saved Department entities back to DepartmentDto
+        return savedDepartments.stream()
+                .map(savedDepartment -> modelMapper.map(savedDepartment, DepartmentDto.class))
+                .toList();
+    }
+
     /**
      * Finds a department by its ID.
      *
      * @param departmentId The ID of the department to find.
      * @return The DTO representing the found department.
-     * @throws DepartmentNotFoundException if the department with the given ID is not found.
+     * @throws DepartmentNotFoundException   if the department with the given ID is not found.
+     * @throws DepartmentBadRequestException with HttpStatus.BAD_REQUEST if departmentId is less than or equal to 0.
      */
     @Override
     public DepartmentDto findDepartmentById(long departmentId) {
+        if (departmentId <= 0) {
+            var errorMessage = MessageProvider.getMessage("department.error.bad_request", departmentId);
+            throw new DepartmentBadRequestException(errorMessage);
+        }
         Optional<Department> departmentOptional = departmentRepository.findById(departmentId);
         return departmentOptional.map(department -> modelMapper.map(department, DepartmentDto.class))
                 .orElseThrow(() -> new DepartmentNotFoundException(
-                        MessageFormat.format("Department with ID {0} not found", departmentId)));
+                        MessageFormat.format(MessageProvider.getMessage(DEPARTMENT_ERROR_NOT_FOUND), departmentId)));
     }
 
     /**
@@ -74,7 +97,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentDto updateDepartment(DepartmentDto departmentDto) {
         // Check if the department with the given ID exists
         validateIfDepartmentIdExists(departmentDto.getDepartmentId(),
-                MessageFormat.format("Department with ID {0} not found", departmentDto.getDepartmentId()));
+                MessageFormat.format(MessageProvider.getMessage(DEPARTMENT_ERROR_NOT_FOUND),
+                        departmentDto.getDepartmentId()));
 
         // Map DepartmentDto to Department entity
         Department department = modelMapper.map(departmentDto, Department.class);
@@ -94,7 +118,8 @@ public class DepartmentServiceImpl implements DepartmentService {
      */
     @Override
     public void deleteDepartment(long departmentId) {
-        validateIfDepartmentIdExists(departmentId, "Department with ID " + departmentId + " not found");
+        validateIfDepartmentIdExists(departmentId, MessageFormat.format(MessageProvider.getMessage(
+                DEPARTMENT_ERROR_NOT_FOUND), departmentId));
         departmentRepository.deleteById(departmentId);
     }
 
@@ -102,7 +127,7 @@ public class DepartmentServiceImpl implements DepartmentService {
      * Validates if a department with the specified ID exists in the repository.
      *
      * @param departmentId  The ID of the department to validate.
-     * @param departmentId1 The ID of the department as a string representation (for error message).
+     * @param departmentId1 The ID of the department as a string representation (for an error message).
      * @throws DepartmentNotFoundException if the department with the given ID is not found.
      */
     private void validateIfDepartmentIdExists(long departmentId, String departmentId1) {

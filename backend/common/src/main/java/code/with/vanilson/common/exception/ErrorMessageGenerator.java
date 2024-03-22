@@ -10,6 +10,10 @@ public class ErrorMessageGenerator {
         return departmentName;
     }
 
+    public static String generateDepartmentBadRequestMessage(String departmentName) {
+        return departmentName;
+    }
+
     public static String generateEmployeeNotFoundMessage(String employeeName) {
         return employeeName;
     }
