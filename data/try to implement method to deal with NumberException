@@ -1,0 +1,84 @@
+
+    /**
+     * Finds a department by its ID.
+     *
+     * @param departmentId The ID of the department to find.
+     * @return The DTO representing the found department.
+     * @throws DepartmentNotFoundException   if the department with the given ID is not found.
+     * @throws DepartmentBadRequestException with HttpStatus.BAD_REQUEST if departmentId is less than or equal to 0.
+     * @throws DepartmentNumberException     if the department ID is not a valid number.
+     */
+    @Override
+    public DepartmentDto findDepartmentById(long departmentId) {
+        try {
+            if (departmentId <= 0) {
+                throw new DepartmentBadRequestException("Invalid department ID: " + departmentId);
+            }
+            Optional<Department> departmentOptional = departmentRepository.findById(departmentId);
+            return departmentOptional.map(department -> modelMapper.map(department, DepartmentDto.class))
+                    .orElseThrow(() -> new DepartmentNotFoundException(
+                            MessageFormat.format("Department with ID {0} not found", departmentId)));
+        } catch (NumberFormatException ex) {
+            String errorMessage = MessageProvider.getMessage("exception.number_format", departmentId);
+            throw new DepartmentNumberException(errorMessage, ex);
+        }
+    }
+
+    controller
+
+    //    /**
+    //     * Handles NumberFormatExceptions thrown when a path variable cannot be converted to a long.
+    //     *
+    //     * @param ex The NumberFormatException that occurred.
+    //     * @return ResponseEntity with a BAD_REQUEST status and an error message.
+    //     */
+    //    @ExceptionHandler(NumberFormatException.class)
+    //    public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
+    //        String errorMessage = MessageProvider.getMessage("exception.number_format");
+    //        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    //                .body(errorMessage);
+    //    }
+
+
+
+    //    @GetMapping("/{id}")
+    //    public ResponseEntity<?> getDepartmentById(@PathVariable("id") String departmentId) {
+    //        try {
+    //            long id = Long.parseLong(departmentId); // Manually parse the department ID
+    //            DepartmentDto department = departmentService.findDepartmentById(id);
+    //            return ResponseEntity.ok(department);
+    //        } catch (NumberFormatException ex) {
+    //            // Handle the case where the department ID is not a valid long
+    ////            String errorMessage = MessageProvider.getMessage("exception.number_format", departmentId);
+    //            throw new DepartmentNumberException(ex.getMessage());
+    //        } catch (DepartmentNotFoundException ex) {
+    //            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
+    //        } catch (DepartmentBadRequestException ex) {
+    //            return exceptionHandlerProvider.handleDepartmentBadRequest(ex);
+    //        }
+    //    }
+
+        /**
+         * Retrieves a department by its ID.
+         *
+         * @param departmentId The ID of the department to retrieve. Must be a valid long value.
+         *                     If a non-numeric value is provided, a Bad Request response will be returned.
+         * @return ResponseEntity with DepartmentDto
+         * representing the found department or an error message if the department is not found or the ID is invalid.
+         */
+        @GetMapping("/{id}")
+        public ResponseEntity<?> getDepartmentById(@PathVariable("id") String departmentIdString) {
+            try {
+                long departmentId = Long.parseLong(departmentIdString);
+                DepartmentDto department = departmentService.findDepartmentById(departmentId);
+                return ResponseEntity.ok(department);
+            } catch (NumberFormatException ex) {
+                String errorMessage = MessageProvider.getMessage("exception.number_format", departmentIdString);
+                return exceptionHandlerProvider.handleDepartmentNumberBadRequest(
+                        new DepartmentNumberException(errorMessage, ex));
+            } catch (DepartmentNotFoundException ex) {
+                return exceptionHandlerProvider.handleDepartmentNotFound(ex);
+            } catch (DepartmentBadRequestException e) {
+                return exceptionHandlerProvider.handleDepartmentBadRequest(e);
+            }
+        }

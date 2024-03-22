@@ -24,3 +24,6 @@ eureka:
 
 server:
   port: 8081
+
+The OpenAPI definitions are in JSON format by default. For yaml format, we can obtain the definitions at:
+http://localhost:8080/api-docs.yaml

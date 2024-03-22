@@ -1,5 +1,6 @@
 package code.with.vanilson.department;
 
+import code.with.vanilson.util.MessageProvider;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,11 +15,14 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentServiceImpl departmentService;
+    private final DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider;
 
     private static final String DEPARTMENT_NOT_FOUND_MESSAGE = "Department with ID %d not found";
 
-    public DepartmentController(DepartmentServiceImpl departmentService) {
+    public DepartmentController(DepartmentServiceImpl departmentService,
+                                DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider) {
         this.departmentService = departmentService;
+        this.exceptionHandlerProvider = exceptionHandlerProvider;
     }
 
     /**
@@ -32,23 +36,16 @@ public class DepartmentController {
         return ResponseEntity.ok(departments);
     }
 
-    /**
-     * Retrieves a department by its ID.
-     *
-     * @param departmentId The ID of the department to retrieve.
-     * @return ResponseEntity with DepartmentDto representing the found department or an error message if the department is not found.
-     */
     @GetMapping("/{id}")
 
-    public ResponseEntity<?> getDepartmentById(
-            @PathVariable("id") long departmentId) {
+    public ResponseEntity<?> getDepartmentById(@PathVariable("id") long departmentId) {
         try {
             DepartmentDto department = departmentService.findDepartmentById(departmentId);
             return ResponseEntity.ok(department);
         } catch (DepartmentNotFoundException ex) {
-            var errorMessage = String.format(DEPARTMENT_NOT_FOUND_MESSAGE, departmentId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(errorMessage);
+            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
+        } catch (DepartmentBadRequestException ex) {
+            return exceptionHandlerProvider.handleDepartmentBadRequest(ex);
         }
     }
 
@@ -66,6 +63,13 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
+    @PostMapping("/save-departments")
+    public ResponseEntity<List<DepartmentDto>> saveDepartments(@RequestBody List<DepartmentDto> departmentDtos) {
+        List<DepartmentDto> savedDepartments = departmentService.saveDepartments(departmentDtos);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(savedDepartments);
+    }
+
     /**
      * Updates an existing department.
      *
@@ -75,20 +79,16 @@ public class DepartmentController {
      */
     @PutMapping("/update-department/{id}")
     public ResponseEntity<?> updateDepartment(
-
-            @PathVariable("id") long departmentId,
-
-            @Valid @RequestBody DepartmentDto departmentDto) {
+            @PathVariable("id") long departmentId, @Valid @RequestBody DepartmentDto departmentDto) {
         if (departmentDto.getDepartmentId() != departmentId) {
-            return ResponseEntity.badRequest().build();
+            return exceptionHandlerProvider.handleDepartmentBadRequest(
+                    new DepartmentBadRequestException("Invalid department ID provided"));
         }
         try {
             DepartmentDto updatedDepartment = departmentService.updateDepartment(departmentDto);
             return ResponseEntity.ok(updatedDepartment);
         } catch (DepartmentNotFoundException ex) {
-            var errorMessage = String.format(DEPARTMENT_NOT_FOUND_MESSAGE, departmentId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(errorMessage);
+            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
         }
     }
 
