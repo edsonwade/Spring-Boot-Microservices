@@ -1,4 +1,4 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.exception;
 
 import code.with.vanilson.common.exception.CommonExceptionHandler;
 import org.springframework.stereotype.Component;

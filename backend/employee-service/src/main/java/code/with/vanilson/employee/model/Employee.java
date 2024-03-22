@@ -1,4 +1,4 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;

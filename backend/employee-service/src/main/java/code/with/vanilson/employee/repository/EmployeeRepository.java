@@ -1,5 +1,6 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.repository;
 
+import code.with.vanilson.employee.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

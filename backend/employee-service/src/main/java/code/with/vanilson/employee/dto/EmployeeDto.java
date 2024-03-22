@@ -1,4 +1,4 @@
-package code.with.vanilson.employee;
+package code.with.vanilson.employee.dto;
 
 import lombok.Data;
 
