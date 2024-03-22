@@ -1,4 +1,6 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.service;
+
+import code.with.vanilson.department.dto.DepartmentDto;
 
 import java.util.List;
 

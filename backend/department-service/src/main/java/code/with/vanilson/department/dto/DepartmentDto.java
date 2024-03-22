@@ -1,4 +1,4 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.dto;
 
 import lombok.Data;
 

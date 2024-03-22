@@ -1,11 +1,9 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.exception.handler;
 
 import code.with.vanilson.common.exception.CommonExceptionHandler;
 import code.with.vanilson.common.exception.ErrorResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static code.with.vanilson.common.exception.zone.CommonZoneRegionConstant.PORTUGAL_LISBON;

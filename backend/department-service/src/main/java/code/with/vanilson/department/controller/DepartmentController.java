@@ -1,14 +1,20 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.controller;
 
+import code.with.vanilson.department.dto.DepartmentDto;
+import code.with.vanilson.department.exception.DepartmentBadRequestException;
+import code.with.vanilson.department.exception.DepartmentNotFoundException;
+import code.with.vanilson.department.exception.DepartmentServiceExceptionHandlerProvider;
+import code.with.vanilson.department.service.DepartmentServiceImpl;
 import code.with.vanilson.util.MessageProvider;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
 import java.util.List;
+
+import static code.with.vanilson.department.service.DepartmentServiceImpl.DEPARTMENT_ERROR_NOT_FOUND;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -16,8 +22,6 @@ public class DepartmentController {
 
     private final DepartmentServiceImpl departmentService;
     private final DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider;
-
-    private static final String DEPARTMENT_NOT_FOUND_MESSAGE = "Department with ID %d not found";
 
     public DepartmentController(DepartmentServiceImpl departmentService,
                                 DepartmentServiceExceptionHandlerProvider exceptionHandlerProvider) {
@@ -63,6 +67,14 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
+    /**
+     * Saves a list of departments.
+     *
+     * @param departmentDtos The list of department DTOs to be saved.
+     * @return ResponseEntity with a list of department DTOs representing the saved departments,
+     * along with a status code of 201 (Created).
+     */
+
     @PostMapping("/save-departments")
     public ResponseEntity<List<DepartmentDto>> saveDepartments(@RequestBody List<DepartmentDto> departmentDtos) {
         List<DepartmentDto> savedDepartments = departmentService.saveDepartments(departmentDtos);
@@ -105,7 +117,8 @@ public class DepartmentController {
             departmentService.deleteDepartment(departmentId);
             return ResponseEntity.noContent().build();
         } catch (DepartmentNotFoundException ex) {
-            var errorMessage = String.format(DEPARTMENT_NOT_FOUND_MESSAGE, departmentId);
+            var errorMessage =
+                    MessageFormat.format(MessageProvider.getMessage(DEPARTMENT_ERROR_NOT_FOUND), departmentId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(errorMessage);
         }

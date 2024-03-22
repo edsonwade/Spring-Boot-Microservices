@@ -1,4 +1,4 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
