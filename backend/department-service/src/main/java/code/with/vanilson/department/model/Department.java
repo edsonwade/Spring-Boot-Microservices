@@ -1,4 +1,4 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;

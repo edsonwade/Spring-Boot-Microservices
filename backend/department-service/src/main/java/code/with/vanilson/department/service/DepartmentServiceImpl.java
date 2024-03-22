@@ -1,5 +1,10 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.service;
 
+import code.with.vanilson.department.dto.DepartmentDto;
+import code.with.vanilson.department.exception.DepartmentBadRequestException;
+import code.with.vanilson.department.exception.DepartmentNotFoundException;
+import code.with.vanilson.department.model.Department;
+import code.with.vanilson.department.repository.DepartmentRepository;
 import code.with.vanilson.util.MessageProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -51,14 +56,21 @@ public class DepartmentServiceImpl implements DepartmentService {
         return modelMapper.map(savedDepartment, DepartmentDto.class);
     }
 
+    /**
+     * Saves a list of departments.
+     *
+     * @param departmentDtos The list of department DTOs to be saved.
+     * @return The list of department DTOs representing the saved departments.
+     */
+
     @Override
     public List<DepartmentDto> saveDepartments(List<DepartmentDto> departmentDtos) {
-        List<Department> departments = departmentDtos.stream()
+        var departments = departmentDtos.stream()
                 .map(departmentDto -> modelMapper.map(departmentDto, Department.class))
                 .toList();
 
         // Save the list of Department entities using the repository
-        List<Department> savedDepartments = departmentRepository.saveAll(departments);
+        var savedDepartments = departmentRepository.saveAll(departments);
 
         // Map the saved Department entities back to DepartmentDto
         return savedDepartments.stream()

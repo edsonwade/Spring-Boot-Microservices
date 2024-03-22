@@ -1,4 +1,4 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

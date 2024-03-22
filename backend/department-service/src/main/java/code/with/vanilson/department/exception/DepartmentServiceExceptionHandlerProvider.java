@@ -1,4 +1,4 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.exception;
 
 import code.with.vanilson.common.exception.CommonExceptionHandler;
 import code.with.vanilson.common.exception.ErrorMessageGenerator;

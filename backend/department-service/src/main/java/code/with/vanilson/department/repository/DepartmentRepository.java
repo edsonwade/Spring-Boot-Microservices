@@ -1,5 +1,6 @@
-package code.with.vanilson.department;
+package code.with.vanilson.department.repository;
 
+import code.with.vanilson.department.model.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
