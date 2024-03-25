@@ -17,4 +17,12 @@ public class ErrorMessageGenerator {
     public static String generateEmployeeNotFoundMessage(String employeeName) {
         return employeeName;
     }
+
+    public static String generateEmployeeBadRequestMessage(String departmentName) {
+        return departmentName;
+    }
+
+    public static String generateEmployeeEmailConflitRequestMessage(String departmentName) {
+        return departmentName;
+    }
 }

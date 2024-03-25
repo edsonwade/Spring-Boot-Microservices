@@ -30,11 +30,4 @@ public class DepartmentServiceExceptionHandlerProvider {
         String errorMessage = ErrorMessageGenerator.generateDepartmentBadRequestMessage(ex.getMessage());
         return commonExceptionHandler.handleBadRequestException(errorMessage);
     }
-
-    @ExceptionHandler(DepartmentNumberException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> handleDepartmentNumberBadRequest(DepartmentNumberException ex) {
-        String errorMessage = ErrorMessageGenerator.generateDepartmentBadRequestMessage(ex.getMessage());
-        return commonExceptionHandler.handleNumberException(errorMessage);
-    }
 }

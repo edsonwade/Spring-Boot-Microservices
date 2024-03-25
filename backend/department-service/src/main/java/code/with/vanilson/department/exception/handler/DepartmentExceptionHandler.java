@@ -31,9 +31,7 @@ public class DepartmentExceptionHandler implements CommonExceptionHandler {
     }
 
     @Override
-    public ResponseEntity<ErrorResponse> handleNumberException(String errorHandler) {
-        var errorResponse =
-                new ErrorResponse(errorHandler, BAD_REQUEST_STATUS, PORTUGAL_LISBON, BAD_REQUEST);
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST_STATUS);
+    public ResponseEntity<ErrorResponse> handleConflictRequestException(String ex) {
+        return null;
     }
 }

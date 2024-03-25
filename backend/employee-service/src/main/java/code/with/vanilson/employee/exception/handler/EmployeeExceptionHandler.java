@@ -6,10 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import static code.with.vanilson.common.exception.zone.CommonZoneRegionConstant.*;
-import static code.with.vanilson.http_codes.EndpointNumberConstant.BAD_REQUEST;
-import static code.with.vanilson.http_codes.EndpointNumberConstant.NOT_FOUND;
-import static code.with.vanilson.http_codes.HttpStatusCodes.BAD_REQUEST_STATUS;
-import static code.with.vanilson.http_codes.HttpStatusCodes.NOT_FOUND_HTTP_STATUS;
+import static code.with.vanilson.http_codes.EndpointNumberConstant.*;
+import static code.with.vanilson.http_codes.HttpStatusCodes.*;
 
 @Component
 public class EmployeeExceptionHandler implements CommonExceptionHandler {
@@ -29,9 +27,9 @@ public class EmployeeExceptionHandler implements CommonExceptionHandler {
     }
 
     @Override
-    public ResponseEntity<ErrorResponse> handleNumberException(String ex) {
+    public ResponseEntity<ErrorResponse> handleConflictRequestException(String ex) {
         ErrorResponse errorResponse =
-                new ErrorResponse(ex, BAD_REQUEST_STATUS, ANGOLA_LUANDA, BAD_REQUEST);
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST_STATUS);
+                new ErrorResponse(ex, CONFLICT_HTTP_STATUS, PORTUGAL_LISBON, CONFLICT);
+        return new ResponseEntity<>(errorResponse, CONFLICT_HTTP_STATUS);
     }
 }

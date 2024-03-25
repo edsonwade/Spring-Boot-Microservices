@@ -1,7 +1,10 @@
 package code.with.vanilson.employee.controller;
 
 import code.with.vanilson.employee.dto.EmployeeDto;
+import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
+import code.with.vanilson.employee.exception.EmployeeServiceExceptionHandlerProvider;
+import code.with.vanilson.employee.exception.EmployeeWithEmailAlreadyExistsException;
 import code.with.vanilson.employee.service.EmployeeServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,11 +22,15 @@ public class EmployeeController {
 
     private final EmployeeServiceImpl employeeService;
 
-    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
+    private final EmployeeServiceExceptionHandlerProvider handlerProvider;
 
-    public EmployeeController(EmployeeServiceImpl employeeService) {
+    public EmployeeController(EmployeeServiceImpl employeeService,
+                              EmployeeServiceExceptionHandlerProvider handlerProvider) {
         this.employeeService = employeeService;
+        this.handlerProvider = handlerProvider;
     }
+
+    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
 
     /**
      * Retrieves all employees.
@@ -43,15 +50,14 @@ public class EmployeeController {
      * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeById(
-            @PathVariable("id") long employeeId) {
+    public ResponseEntity<?> getEmployeeById(@PathVariable("id") long employeeId) {
         try {
             EmployeeDto employee = employeeService.findEmployeeById(employeeId);
             return ResponseEntity.ok(employee);
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = getMessage(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
-            return ResponseEntity.status(NOT_FOUND)
-                    .body(errorMessage);
+            return handlerProvider.handleEmployeeNotFound(ex);
+        } catch (EmployeeBadRequestException ex) {
+            return handlerProvider.handleEmployeeBadRequest(ex);
         }
     }
 
@@ -62,8 +68,7 @@ public class EmployeeController {
      * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
      */
     @GetMapping("/by-email")
-    public ResponseEntity<?> getEmployeeByEmail(
-            @RequestParam("email") String email) {
+    public ResponseEntity<?> getEmployeeByEmail(@RequestParam("email") String email) {
         try {
             EmployeeDto employee = employeeService.findEmployeeByEmail(email);
             return ResponseEntity.ok(employee);
@@ -82,10 +87,17 @@ public class EmployeeController {
      * @return ResponseEntity with EmployeeDto representing the created employee.
      */
     @PostMapping("/create-employee")
-    public ResponseEntity<EmployeeDto> createEmployee(
+    public ResponseEntity<?> createEmployee(
             @Valid @RequestBody EmployeeDto employeeDto) {
-        EmployeeDto saveEmployee = employeeService.saveEmployeeDto(employeeDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saveEmployee);
+
+        try {
+
+            EmployeeDto saveEmployee = employeeService.saveEmployeeDto(employeeDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saveEmployee);
+        } catch (EmployeeWithEmailAlreadyExistsException ex) {
+            return handlerProvider.handleEmployeeWithEmailAlreadyExistException(ex);
+        }
+
     }
 
     /**
@@ -97,9 +109,8 @@ public class EmployeeController {
      */
     @PutMapping("/update-employee/{id}")
 
-    public ResponseEntity<?> updateEmployee(
-            @PathVariable("id") long employeeId,
-            @Valid @RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") long employeeId,
+                                            @Valid @RequestBody EmployeeDto employeeDto) {
         if (employeeDto.getEmployeeId() != employeeId) {
             return ResponseEntity.badRequest().build();
         }
@@ -107,9 +118,11 @@ public class EmployeeController {
             EmployeeDto updateEmployeeDto = employeeService.updateEmployeeDto(employeeDto);
             return ResponseEntity.ok(updateEmployeeDto);
         } catch (EmployeeNotFoundException ex) {
-            var errorMessage = getMessage(EMPLOYEE_NOT_FOUND_MESSAGE, employeeId);
-            return ResponseEntity.status(NOT_FOUND)
-                    .body(errorMessage);
+            return handlerProvider.handleEmployeeNotFound(ex);
+        } catch (EmployeeBadRequestException ex) {
+            return handlerProvider.handleEmployeeBadRequest(ex);
+        } catch (EmployeeWithEmailAlreadyExistsException ex) {
+            return handlerProvider.handleEmployeeWithEmailAlreadyExistException(ex);
         }
     }
 
