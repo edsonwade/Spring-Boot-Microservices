@@ -40,7 +40,7 @@ public final class HttpStatusCodes {
     public static final HttpStatus NOT_ACCEPTABLE = HttpStatus.NOT_ACCEPTABLE;
     public static final HttpStatus PROXY_AUTHENTICATION_REQUIRED = HttpStatus.PROXY_AUTHENTICATION_REQUIRED;
     public static final HttpStatus REQUEST_TIMEOUT = HttpStatus.REQUEST_TIMEOUT;
-    public static final HttpStatus CONFLICT = HttpStatus.CONFLICT;
+    public static final HttpStatus CONFLICT_HTTP_STATUS = HttpStatus.CONFLICT;
     public static final HttpStatus GONE = HttpStatus.GONE;
     public static final HttpStatus LENGTH_REQUIRED = HttpStatus.LENGTH_REQUIRED;
     public static final HttpStatus PRECONDITION_FAILED = HttpStatus.PRECONDITION_FAILED;

@@ -1,10 +1,12 @@
 package code.with.vanilson.employee.service;
 
 import code.with.vanilson.employee.dto.EmployeeDto;
+import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
 import code.with.vanilson.employee.exception.EmployeeWithEmailAlreadyExistsException;
 import code.with.vanilson.employee.model.Employee;
 import code.with.vanilson.employee.repository.EmployeeRepository;
+import code.with.vanilson.util.MessageProvider;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     private final ModelMapper modelMapper;
+
+    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
 
     public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
@@ -46,10 +50,14 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public EmployeeDto findEmployeeById(long employeeId) {
+        if (employeeId <= 0) {
+            var errorMessage = MessageProvider.getMessage("employee.error.bad_request", employeeId);
+            throw new EmployeeBadRequestException(errorMessage);
+        }
         Optional<Employee> departmentOptional = employeeRepository.findById(employeeId);
         return departmentOptional.map(department -> modelMapper.map(department, EmployeeDto.class))
                 .orElseThrow(() -> new EmployeeNotFoundException(
-                        MessageFormat.format("Employee with ID {0} not found", employeeId)));
+                        MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId)));
 
     }
 
@@ -64,9 +72,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDto findEmployeeByEmail(String employeeEmail) {
         Optional<Employee> departmentOptional =
                 Optional.ofNullable(employeeRepository.findEmployeeByEmail(employeeEmail));
-        return departmentOptional.map(department -> modelMapper.map(department, EmployeeDto.class))
+        return departmentOptional
+                .map(department -> modelMapper.map(department, EmployeeDto.class))
                 .orElseThrow(() -> new EmployeeNotFoundException(
-                        MessageFormat.format("Employee with EMAIL {0} not found", employeeEmail)));
+                        MessageFormat.format(MessageProvider.getMessage("employee.error.email.not_found"),
+                                employeeEmail)));
 
     }
 
@@ -123,7 +133,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteEmployee(long employeeId) {
         if (!employeeRepository.existsById(employeeId)) {
-            throw new EmployeeNotFoundException("Employee with ID " + employeeId + " not found");
+            throw new EmployeeNotFoundException(
+                    MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId));
         }
         employeeRepository.deleteById(employeeId);
     }
@@ -149,7 +160,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     public void validateEmailAndThrowException(String email) {
         if (employeeRepository.existsByEmail(email)) {
-            throw new EmployeeWithEmailAlreadyExistsException("Email already exists: " + email);
+            throw new EmployeeWithEmailAlreadyExistsException(
+                    MessageFormat.format(MessageProvider.getMessage("employee.error.email.conflict_request"), email));
         }
     }
 }
