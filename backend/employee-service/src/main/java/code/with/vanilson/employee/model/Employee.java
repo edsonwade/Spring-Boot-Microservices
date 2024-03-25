@@ -17,7 +17,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @ToString
-@JsonPropertyOrder({"employeeId", "firstName", "lastName", "email"})
+@JsonPropertyOrder({"employeeId", "firstName", "lastName", "email", "departmentCode"})
 public class Employee implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -31,6 +31,8 @@ public class Employee implements Serializable {
     @Column(unique = true)
     @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}")
     private String email;
+    @Column(name = "department_code")
+    private String departmentCode;
 
     public Employee() {
         //default constructor
@@ -41,5 +43,13 @@ public class Employee implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+    }
+
+    public Employee(long employeeId, String firstName, String lastName, String email, String departmentCode) {
+        this.employeeId = employeeId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.departmentCode = departmentCode;
     }
 }
