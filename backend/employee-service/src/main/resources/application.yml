@@ -35,3 +35,7 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+
+department:
+  service:
+    url: http://localhost:8082/api/departments/

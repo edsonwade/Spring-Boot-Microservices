@@ -1,5 +1,6 @@
 package code.with.vanilson.employee.controller;
 
+import code.with.vanilson.employee.dto.EmployeeDepartmentWrapper;
 import code.with.vanilson.employee.dto.EmployeeDto;
 import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
@@ -17,7 +18,7 @@ import static code.with.vanilson.http_codes.EndpointNumberConstant.NOT_FOUND;
 import static code.with.vanilson.util.MessageProvider.getMessage;
 
 @RestController
-@RequestMapping("/api/employees")
+@RequestMapping(path = "/api/employees")
 public class EmployeeController {
 
     private final EmployeeServiceImpl employeeService;
@@ -43,22 +44,46 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
-    /**
-     * Retrieves an employee by its ID.
-     *
-     * @param employeeId The ID of the employee to retrieve.
-     * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable("id") long employeeId) {
-        try {
-            EmployeeDto employee = employeeService.findEmployeeById(employeeId);
-            return ResponseEntity.ok(employee);
-        } catch (EmployeeNotFoundException ex) {
-            return handlerProvider.handleEmployeeNotFound(ex);
-        } catch (EmployeeBadRequestException ex) {
-            return handlerProvider.handleEmployeeBadRequest(ex);
-        }
+//    /**
+//     * Retrieves an employee by its ID.
+//     *
+//     * @param employeeId The ID of the employee to retrieve.
+//     * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
+//     */
+//    @GetMapping("/{id}")
+//    public ResponseEntity<?> getEmployeeById(@PathVariable("id") long employeeId) {
+//        try {
+//            EmployeeDto employee = employeeService.findEmployeeById(employeeId);
+//            return ResponseEntity.ok(employee);
+//        } catch (EmployeeNotFoundException ex) {
+//            return handlerProvider.handleEmployeeNotFound(ex);
+//        } catch (EmployeeBadRequestException ex) {
+//            return handlerProvider.handleEmployeeBadRequest(ex);
+//        }
+//    }
+//
+//    @GetMapping(value = "{id}")
+//    public ResponseEntity<APIResponseDto> listEmployeeById(@PathVariable("id") long emp) {
+//        try {
+//            var apiResponseDto = employeeService.getEmployeeById(emp);
+//            return ResponseEntity.ok(apiResponseDto);
+//        } catch (EmployeeNotFoundException ex) {
+//            return new ResponseEntity<>(handlerProvider.handleEmployeeNotFound(ex).getStatusCode());
+//        } catch (EmployeeBadRequestException ex) {
+//            return new ResponseEntity<>(handlerProvider.handleEmployeeBadRequest(ex).getStatusCode());
+//        }
+//    }
+
+//    @GetMapping("/{departmentId}")
+//    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartmentId(@PathVariable long departmentId) {
+//        var employees = employeeService.findByDepartmentId(departmentId);
+//        return ResponseEntity.ok(employees);
+//    }
+
+    @GetMapping("/{departmentId}")
+    public ResponseEntity<EmployeeDepartmentWrapper> getEmployeesByDepartmentId(@PathVariable long departmentId) {
+        EmployeeDepartmentWrapper wrapper = employeeService.findByDepartmentId(departmentId);
+        return ResponseEntity.ok(wrapper);
     }
 
     /**
@@ -67,7 +92,7 @@ public class EmployeeController {
      * @param email The email address of the employee to retrieve.
      * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
      */
-    @GetMapping("/by-email")
+    @GetMapping(value = "/by-email")
     public ResponseEntity<?> getEmployeeByEmail(@RequestParam("email") String email) {
         try {
             EmployeeDto employee = employeeService.findEmployeeByEmail(email);
