@@ -13,8 +13,10 @@ public class EmployeeServiceExceptionHandlerProvider {
 
     private final CommonExceptionHandler commonExceptionHandler;
 
-    public EmployeeServiceExceptionHandlerProvider(CommonExceptionHandler commonExceptionHandler) {
+    public EmployeeServiceExceptionHandlerProvider(CommonExceptionHandler commonExceptionHandler
+    ) {
         this.commonExceptionHandler = commonExceptionHandler;
+
     }
 
     @ExceptionHandler(EmployeeNotFoundException.class)

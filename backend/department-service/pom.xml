@@ -19,6 +19,11 @@
             <groupId>code.with.vanilson</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.2</version> <!-- Specify the version you want to use -->
+        </dependency>
     </dependencies>
 
 </project>

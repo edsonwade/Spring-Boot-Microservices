@@ -1,0 +1,138 @@
+@Service
+public class EmployeeService {
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${department.service.url}")
+    private String departmentServiceUrl;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    public EmployeeDepartmentWrapper findByDepartmentId(long departmentId) {
+        DepartmentDto departmentDto = fetchDepartmentDetails(departmentId);
+        EmployeeDto employeeDto = fetchEmployeeDetails(departmentDto.getDepartmentId());
+        return new EmployeeDepartmentWrapper(departmentDto, employeeDto);
+    }
+
+    private DepartmentDto fetchDepartmentDetails(long departmentId) {
+        ResponseEntity<DepartmentDto> departmentResponse =
+                restTemplate.getForEntity(departmentServiceUrl + departmentId, DepartmentDto.class);
+
+        if (departmentResponse.getStatusCode() == HttpStatus.OK) {
+            return departmentResponse.getBody();
+        } else {
+            throw new EmployeeNotFoundException("Department not found");
+        }
+    }
+
+    private EmployeeDto fetchEmployeeDetails(long departmentId) {
+        Optional<Employee> employeeOptional = employeeRepository.findById(departmentId);
+        Employee employee = employeeOptional.orElseThrow(() -> new EmployeeNotFoundException("No employee found for the given department"));
+        return mapToEmployeeDTO(employee);
+    }
+
+    private EmployeeDto mapToEmployeeDTO(Employee employee) {
+        EmployeeDto employeeDTO = new EmployeeDto();
+        employeeDTO.setEmployeeId(employee.getEmployeeId());
+        employeeDTO.setFirstName(employee.getFirstName());
+        employeeDTO.setLastName(employee.getLastName());
+        employeeDTO.setEmail(employee.getEmail());
+        employeeDTO.setDepartmentCode(employee.getDepartmentCode());
+        return employeeDTO;
+    }
+}
+
+
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController {
+    @Autowired
+    private EmployeeService employeeService;
+
+    @GetMapping("/{departmentId}")
+    public ResponseEntity<EmployeeDepartmentWrapper> getEmployeesByDepartmentId(@PathVariable long departmentId) {
+        EmployeeDepartmentWrapper wrapper = employeeService.findByDepartmentId(departmentId);
+        return ResponseEntity.ok(wrapper);
+    }
+}
+
+
+<dependency>
+    <groupId>org.modelmapper</groupId>
+    <artifactId>modelmapper</artifactId>
+    <version>2.4.4</version>
+</dependency>
+
+
+@Service
+public class EmployeeService {
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${department.service.url}")
+    private String departmentServiceUrl;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public EmployeeDepartmentWrapper findByDepartmentId(long departmentId) {
+        DepartmentDto departmentDto = fetchDepartmentDetails(departmentId);
+        EmployeeDto employeeDto = fetchEmployeeDetails(departmentDto.getDepartmentId());
+        return new EmployeeDepartmentWrapper(departmentDto, employeeDto);
+    }
+
+    private DepartmentDto fetchDepartmentDetails(long departmentId) {
+        ResponseEntity<DepartmentDto> departmentResponse =
+                restTemplate.getForEntity(departmentServiceUrl + departmentId, DepartmentDto.class);
+
+        if (departmentResponse.getStatusCode() == HttpStatus.OK) {
+            return departmentResponse.getBody();
+        } else {
+            throw new EmployeeNotFoundException("Department not found");
+        }
+    }
+
+    private EmployeeDto fetchEmployeeDetails(long departmentId) {
+        Optional<Employee> employeeOptional = employeeRepository.findById(departmentId);
+        Employee employee = employeeOptional.orElseThrow(() -> new EmployeeNotFoundException("No employee found for the given department"));
+        return modelMapper.map(employee, EmployeeDto.class);
+    }
+}
+
+
+
+private Optional<DepartmentDto> fetchDepartmentDetails(long departmentId) {
+    ResponseEntity<DepartmentDto> departmentResponse =
+            restTemplate.getForEntity(departmentServiceUrl + departmentId, DepartmentDto.class);
+
+    if (departmentResponse.getStatusCode() == HttpStatus.OK) {
+        return Optional.ofNullable(departmentResponse.getBody());
+    } else {
+        // Return an empty Optional if department not found
+        return Optional.empty();
+    }
+}
+
+
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @GetMapping("/{departmentId}")
+    public ResponseEntity<EmployeeDepartmentWrapper> getEmployeesByDepartmentId(@PathVariable long departmentId) {
+        Optional<EmployeeDepartmentWrapper> wrapperOptional = employeeService.findByDepartmentId(departmentId);
+
+        if (wrapperOptional.isPresent()) {
+            return ResponseEntity.ok(wrapperOptional.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found");
+        }
+    }
+}

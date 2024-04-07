@@ -1,10 +1,18 @@
 package code.with.vanilson.employee.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@JsonPropertyOrder({"employee", "department"})
 public class EmployeeDepartmentWrapper {
     private DepartmentDto department;
     private EmployeeDto employee;
 
     public EmployeeDepartmentWrapper() {
+        // default constructors
     }
 
     public EmployeeDepartmentWrapper(DepartmentDto department, EmployeeDto employee) {
@@ -12,19 +20,4 @@ public class EmployeeDepartmentWrapper {
         this.employee = employee;
     }
 
-    public DepartmentDto getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(DepartmentDto department) {
-        this.department = department;
-    }
-
-    public EmployeeDto getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(EmployeeDto employee) {
-        this.employee = employee;
-    }
 }

@@ -1,16 +1,16 @@
 package code.with.vanilson.employee.service;
 
+import code.with.vanilson.department.exception.DepartmentNotFoundException;
 import code.with.vanilson.employee.dto.DepartmentDto;
 import code.with.vanilson.employee.dto.EmployeeDepartmentWrapper;
 import code.with.vanilson.employee.dto.EmployeeDto;
 import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
 import code.with.vanilson.employee.exception.EmployeeWithEmailAlreadyExistsException;
-import code.with.vanilson.employee.exception.ObjectNotFoundException;
-import code.with.vanilson.employee.mapper.EmployeeMapper;
 import code.with.vanilson.employee.model.Employee;
 import code.with.vanilson.employee.repository.EmployeeRepository;
 import code.with.vanilson.util.MessageProvider;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final RestTemplate restTemplate;
 
-    private final EmployeeMapper employeeMapper;
+    private final ModelMapper modelMapper;
 
     @Value("${department.service.url}")
     private String departmentServiceUrl;
@@ -36,10 +36,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
 
     public EmployeeServiceImpl(EmployeeRepository employeeRepository, RestTemplate restTemplate,
-                               EmployeeMapper employeeMapper) {
+                               ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
         this.restTemplate = restTemplate;
-        this.employeeMapper = employeeMapper;
+        this.modelMapper = modelMapper;
     }
 
     /**
@@ -49,8 +49,10 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public List<EmployeeDto> findAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        return employeeMapper.mapEmployeeListToDto(employees);
+        List<Employee> departments = employeeRepository.findAll();
+        return departments.stream()
+                .map(employee -> modelMapper.map(employee, EmployeeDto.class))
+                .toList();
     }
 
     /**
@@ -58,19 +60,20 @@ public class EmployeeServiceImpl implements EmployeeService {
      *
      * @param employeeId The ID of the employee to find.
      * @return The DTO representing the found employee.
-     * @throws EmployeeNotFoundException   if the employee with the given ID is not found.
-     * @throws EmployeeBadRequestException if the provided employee ID is not valid.
+     * @throws EmployeeNotFoundException if the employee with the given ID is not found.
      */
     @Override
     public EmployeeDto findEmployeeById(long employeeId) {
+
         if (employeeId <= 0) {
             var errorMessage = MessageProvider.getMessage("employee.error.bad_request", employeeId);
             throw new EmployeeBadRequestException(errorMessage);
         }
         Optional<Employee> employee = employeeRepository.findById(employeeId);
-        return employee.map(employeeMapper::mapToEmployeeDto)
+        return employee.map(department -> modelMapper.map(department, EmployeeDto.class))
                 .orElseThrow(() -> new EmployeeNotFoundException(
                         MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId)));
+
     }
 
     /**
@@ -78,13 +81,13 @@ public class EmployeeServiceImpl implements EmployeeService {
      *
      * @param departmentId the ID of the department to retrieve employee and department details.
      * @return an EmployeeDepartmentWrapper containing the employee and department details.
-     * @throws EmployeeNotFoundException if no employee is found for the given department or if department details are null.
-     * @throws ObjectNotFoundException   if the department corresponding to the provided ID is not found.
+     * @throws EmployeeNotFoundException   if no employee is found for the given department or if department details are null.
+     * @throws DepartmentNotFoundException if the department corresponding to the provided ID is not found.
      */
     public EmployeeDepartmentWrapper getEmployeeWithDepartmentByDepartmentId(long departmentId) {
         DepartmentDto departmentDto = fetchDepartmentDetails(departmentId);
         Employee employee = fetchEmployeeByDepartmentId(departmentDto.getDepartmentId());
-        EmployeeDto employeeDto = employeeMapper.mapToEmployeeDto(employee);
+        EmployeeDto employeeDto = mapToEmployeeDTO(employee);
         return new EmployeeDepartmentWrapper(departmentDto, employeeDto);
     }
 
@@ -97,12 +100,14 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public EmployeeDto findEmployeeByEmail(String employeeEmail) {
-        Employee employee = employeeRepository.findEmployeeByEmail(employeeEmail);
-        if (employee == null) {
-            throw new EmployeeNotFoundException(
-                    MessageFormat.format(MessageProvider.getMessage("employee.error.email.not_found"), employeeEmail));
-        }
-        return employeeMapper.mapToEmployeeDto(employee);
+        Optional<Employee> departmentOptional =
+                Optional.ofNullable(employeeRepository.findEmployeeByEmail(employeeEmail));
+        return departmentOptional
+                .map(department -> modelMapper.map(department, EmployeeDto.class))
+                .orElseThrow(() -> new EmployeeNotFoundException(
+                        MessageFormat.format(MessageProvider.getMessage("employee.error.email.not_found"),
+                                employeeEmail)));
+
     }
 
     /**
@@ -114,10 +119,18 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public EmployeeDto saveEmployeeDto(EmployeeDto employeeDto) {
-        validateEmailAndThrowException(employeeDto.getEmail());
-        Employee employee = employeeMapper.mapToEmployeeEntity(employeeDto);
+        // Map DepartmentDto to Department entity
+        Employee employee = modelMapper.map(employeeDto, Employee.class);
+
+        // check if the email already exists
+        validateEmailAndThrowException(employee.getEmail());
+
+        // Save the Employee entity using the repository
         Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.mapToEmployeeDto(savedEmployee);
+
+        // Map the saved Employee entity back to EmployeeDto
+        return modelMapper.map(savedEmployee, EmployeeDto.class);
+
     }
 
     /**
@@ -128,24 +141,27 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @throws EmployeeNotFoundException               If the employee with the specified ID does not exist.
      * @throws EmployeeWithEmailAlreadyExistsException If an employee with the specified email already exists.
      */
+
     @Override
     public EmployeeDto updateEmployeeDto(EmployeeDto employeeDto) {
-        validateEmployeeId(employeeDto.getEmployeeId());
+        // Check if the employee with the given ID exists
+        validateIfEmployeeIdExists(employeeDto.getEmployeeId(),
+                MessageFormat.format("EmployeeDto with ID {0} not found", employeeDto.getEmployeeId()));
+        // Check if the employee with the given email exists
         validateEmailAndThrowException(employeeDto.getEmail());
-        Employee employee = employeeMapper.mapToEmployeeEntity(employeeDto);
+
+        // Map EmployeeDto to Employee entity
+        Employee employee = modelMapper.map(employeeDto, Employee.class);
+
+        // Save the updated Employee entity using the repository
         Employee updatedEmployee = employeeRepository.save(employee);
-        return employeeMapper.mapToEmployeeDto(updatedEmployee);
+
+        // Map the updated Employee entity back to EmployeeDto
+        return modelMapper.map(updatedEmployee, EmployeeDto.class);
     }
 
-    /**
-     * Deletes an employee by its ID.
-     *
-     * @param employeeId The ID of the employee to delete.
-     * @throws EmployeeNotFoundException If the employee with the specified ID does not exist.
-     */
     @Override
     public void deleteEmployee(long employeeId) {
-        validateEmployeeId(employeeId);
         if (!employeeRepository.existsById(employeeId)) {
             throw new EmployeeNotFoundException(
                     MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId));
@@ -157,13 +173,12 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Validates whether an employee with the given ID exists.
      *
      * @param employeeId The ID of the employee to check.
-     * @throws EmployeeNotFoundException   If the employee with the specified ID does not exist.
-     * @throws EmployeeBadRequestException If the provided employee ID is not valid.
+     * @param empId      The employee identifier (used for an exception message).
+     * @throws EmployeeNotFoundException If the employee with the specified ID does not exist.
      */
-    private void validateEmployeeId(long employeeId) {
-        if (employeeId <= 0) {
-            String errorMessage = MessageProvider.getMessage("employee.error.bad_request", employeeId);
-            throw new EmployeeBadRequestException(errorMessage);
+    private void validateIfEmployeeIdExists(long employeeId, String empId) {
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new EmployeeNotFoundException(empId);
         }
     }
 
@@ -173,7 +188,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param email The email address to check.
      * @throws EmployeeWithEmailAlreadyExistsException If an employee with the specified email already exists.
      */
-    private void validateEmailAndThrowException(String email) {
+    public void validateEmailAndThrowException(String email) {
         if (employeeRepository.existsByEmail(email)) {
             throw new EmployeeWithEmailAlreadyExistsException(
                     MessageFormat.format(MessageProvider.getMessage("employee.error.email.conflict_request"), email));
@@ -185,16 +200,16 @@ public class EmployeeServiceImpl implements EmployeeService {
      *
      * @param departmentId the ID of the department to fetch details for.
      * @return the DepartmentDto representing the department details.
-     * @throws ObjectNotFoundException if the department corresponding to the provided ID is not found.
+     * @throws DepartmentNotFoundException if the department corresponding to the provided ID is not found.
      */
     private DepartmentDto fetchDepartmentDetails(long departmentId) {
         ResponseEntity<DepartmentDto> departmentResponse =
                 restTemplate.getForEntity(departmentServiceUrl + departmentId, DepartmentDto.class);
         if (departmentResponse.getStatusCode() == HttpStatus.OK) {
             return Optional.ofNullable(departmentResponse.getBody())
-                    .orElseThrow(() -> new ObjectNotFoundException("Department details are null"));
+                    .orElseThrow(() -> new DepartmentNotFoundException("Department details are null"));
         } else {
-            throw new ObjectNotFoundException("Department not found");
+            throw new DepartmentNotFoundException("Department not found");
         }
     }
 
@@ -211,4 +226,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 () -> new EmployeeNotFoundException("No employee found for the given department"));
     }
 
+    private EmployeeDto mapToEmployeeDTO(Employee employee) {
+        var employeeDTO = new EmployeeDto();
+        employeeDTO.setEmployeeId(employee.getEmployeeId());
+        employeeDTO.setFirstName(employee.getFirstName());
+        employeeDTO.setLastName(employee.getLastName());
+        employeeDTO.setEmail(employee.getEmail());
+        employeeDTO.setDepartmentCode(employee.getDepartmentCode());
+        return employeeDTO;
+    }
 }
