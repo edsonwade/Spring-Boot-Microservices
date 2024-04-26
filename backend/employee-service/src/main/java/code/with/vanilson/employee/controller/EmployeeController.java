@@ -1,6 +1,6 @@
 package code.with.vanilson.employee.controller;
 
-import code.with.vanilson.employee.dto.EmployeeDepartmentWrapper;
+import code.with.vanilson.employee.dto.APIResponseDto;
 import code.with.vanilson.employee.dto.EmployeeDto;
 import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
@@ -50,7 +50,7 @@ public class EmployeeController {
      * @param employeeId The ID of the employee to retrieve.
      * @return ResponseEntity with EmployeeDto representing the found employee or an error message if the employee is not found.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("id") long employeeId) {
         try {
             EmployeeDto employee = employeeService.findEmployeeById(employeeId);
@@ -60,37 +60,6 @@ public class EmployeeController {
         } catch (EmployeeBadRequestException ex) {
             return handlerProvider.handleEmployeeBadRequest(ex);
         }
-    }
-//
-//    @GetMapping(value = "{id}")
-//    public ResponseEntity<APIResponseDto> listEmployeeById(@PathVariable("id") long emp) {
-//        try {
-//            var apiResponseDto = employeeService.getEmployeeById(emp);
-//            return ResponseEntity.ok(apiResponseDto);
-//        } catch (EmployeeNotFoundException ex) {
-//            return new ResponseEntity<>(handlerProvider.handleEmployeeNotFound(ex).getStatusCode());
-//        } catch (EmployeeBadRequestException ex) {
-//            return new ResponseEntity<>(handlerProvider.handleEmployeeBadRequest(ex).getStatusCode());
-//        }
-//    }
-
-//    @GetMapping("/{departmentId}")
-//    public ResponseEntity<List<EmployeeDto>> getEmployeesByDepartmentId(@PathVariable long departmentId) {
-//        var employees = employeeService.findByDepartmentId(departmentId);
-//        return ResponseEntity.ok(employees);
-//    }
-
-    /**
-     * Retrieves the employee along with their associated department details by the provided department ID.
-     *
-     * @param id the ID of the department to retrieve employee and department details.
-     * @return ResponseEntity containing an EmployeeDepartmentWrapper with the employee and department details.
-     */
-
-    @GetMapping("/department/{id}")
-    public ResponseEntity<EmployeeDepartmentWrapper> getEmployeesByDepartmentId(@PathVariable long id) {
-        EmployeeDepartmentWrapper wrapper = employeeService.getEmployeeWithDepartmentByDepartmentId(id);
-        return ResponseEntity.ok(wrapper);
     }
 
     /**
@@ -110,6 +79,19 @@ public class EmployeeController {
                     .body(errorMessage);
         }
 
+    }
+
+    /**
+     * Builds the Get Employee REST API endpoint.
+     * Retrieves an employee and their associated department information by their ID.
+     *
+     * @param employeeId The ID of the employee to retrieve.
+     * @return A ResponseEntity containing an APIResponseDto representing the employee and their department.
+     */
+    @GetMapping("/departments/{id}")
+    public ResponseEntity<APIResponseDto> getEmployee(@PathVariable("id") Long employeeId) {
+        APIResponseDto apiResponseDto = employeeService.getEmployeeWithDepartmentById(employeeId);
+        return ResponseEntity.ok(apiResponseDto);
     }
 
     /**

@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
     public static final String DEPARTMENT_ERROR_NOT_FOUND = "department.error.not_found";
+    public static final String DEPARTMENT_ERROR_CODE_NOT_FOUND = "department.error.code.not_found";
 
     private final DepartmentRepository departmentRepository;
     private final ModelMapper modelMapper;
@@ -120,6 +122,30 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         // Map the updated Department entity back to DepartmentDto
         return modelMapper.map(updatedDepartment, DepartmentDto.class);
+    }
+
+    /**
+     * Retrieves a department by its unique department code.
+     *
+     * @param departmentCode The unique code of the department to retrieve.
+     * @return The DTO representation of the department if found.
+     * @throws DepartmentNotFoundException If no department with the given code is found.
+     */
+
+    @Override
+    public DepartmentDto getDepartmentByCode(String departmentCode) {
+        Department department = departmentRepository.findByDepartmentCode(departmentCode);
+        if (Objects.nonNull(department)) {
+            return new DepartmentDto(
+                    department.getDepartmentId(),
+                    department.getDepartmentName(),
+                    department.getDepartmentDescription(),
+                    department.getDepartmentCode()
+            );
+        }
+        // Department with given code not found, handle appropriately
+        throw new DepartmentNotFoundException(
+                MessageFormat.format(MessageProvider.getMessage(DEPARTMENT_ERROR_CODE_NOT_FOUND), departmentCode));
     }
 
     /**

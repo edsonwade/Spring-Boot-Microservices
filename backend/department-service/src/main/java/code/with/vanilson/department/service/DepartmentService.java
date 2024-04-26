@@ -15,5 +15,7 @@ public interface DepartmentService {
 
     DepartmentDto updateDepartment(DepartmentDto departmentDto);
 
+    DepartmentDto  getDepartmentByCode(String code);
+
     void deleteDepartment(long departmentId);
 }
