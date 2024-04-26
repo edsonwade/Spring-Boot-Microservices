@@ -1,0 +1,16 @@
+Set Environment Variables before Running the JAR:
+Before running the JAR file, ensure that you set the environment variables POSTGRES_USERNAME and POSTGRES_PASSWORD in your command-line or terminal session. For example:
+export POSTGRES_USERNAME=your_username
+export POSTGRES_PASSWORD=your_password
+java-jar department-service-0.0.1-SNAPSHOT.jar --server.port=8082
+
+
+Replace your_username and your_password with your actual database username and password.
+Pass Username and Password as Command-line Arguments:
+Instead of relying on environment variables, you can pass the database username and password as command-line arguments when running the JAR file. Modify your command as follows:
+
+java -jar department-service-0.0.1-SNAPSHOT.jar --server.port=8082 --spring.datasource.username=your_username --spring.datasource.password=your_password
+
+
+podes copira atua applicação add VM Options on edit config
+and add -Dserver.port=8082 -- port number you want it
