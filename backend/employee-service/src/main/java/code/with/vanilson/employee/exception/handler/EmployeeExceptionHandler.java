@@ -5,7 +5,8 @@ import code.with.vanilson.common.exception.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import static code.with.vanilson.common.exception.zone.CommonZoneRegionConstant.*;
+import static code.with.vanilson.common.exception.zone.CommonZoneRegionConstant.PORTUGAL_LISBON;
+import static code.with.vanilson.common.exception.zone.CommonZoneRegionConstant.UK_LONDON;
 import static code.with.vanilson.http_codes.EndpointNumberConstant.*;
 import static code.with.vanilson.http_codes.HttpStatusCodes.*;
 

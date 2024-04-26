@@ -1,0 +1,16 @@
+@SpringBootApplication
+public class EmployeeServiceApplication {
+    public static void main(String[] args) {
+        run(EmployeeServiceApplication.class, args);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder().build();
+    }
+}

@@ -1,18 +1,16 @@
 package code.with.vanilson;
 
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 
 import static org.springframework.boot.SpringApplication.run;
 
 @SpringBootApplication
+@EnableFeignClients
+@ImportAutoConfiguration({FeignAutoConfiguration.class})
 public class EmployeeServiceApplication {
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
     public static void main(String[] args) {
         run(EmployeeServiceApplication.class, args);
     }

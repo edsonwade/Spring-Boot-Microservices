@@ -1,17 +1,21 @@
 package code.with.vanilson.employee.service;
 
-import code.with.vanilson.employee.api.client.APIClient;
-import code.with.vanilson.employee.dto.APIResponseDto;
 import code.with.vanilson.employee.dto.DepartmentDto;
+import code.with.vanilson.employee.dto.EmployeeDepartmentWrapper;
 import code.with.vanilson.employee.dto.EmployeeDto;
 import code.with.vanilson.employee.exception.EmployeeBadRequestException;
 import code.with.vanilson.employee.exception.EmployeeNotFoundException;
 import code.with.vanilson.employee.exception.EmployeeWithEmailAlreadyExistsException;
+import code.with.vanilson.employee.exception.ObjectNotFoundException;
 import code.with.vanilson.employee.mapper.EmployeeMapper;
 import code.with.vanilson.employee.model.Employee;
 import code.with.vanilson.employee.repository.EmployeeRepository;
 import code.with.vanilson.util.MessageProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -22,16 +26,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
 
+    private final RestTemplate restTemplate;
+
     private final EmployeeMapper employeeMapper;
 
-    private final APIClient apiClient;
+    @Value("${department.service.url}")
+    private String departmentServiceUrl;
 
     private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
 
-    public EmployeeServiceImpl(APIClient apiClient, EmployeeRepository employeeRepository,
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, RestTemplate restTemplate,
                                EmployeeMapper employeeMapper) {
-        this.apiClient = apiClient;
         this.employeeRepository = employeeRepository;
+        this.restTemplate = restTemplate;
         this.employeeMapper = employeeMapper;
     }
 
@@ -67,6 +74,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
+     * Retrieves the employee along with their associated department details by the provided department ID.
+     *
+     * @param departmentId the ID of the department to retrieve employee and department details.
+     * @return an EmployeeDepartmentWrapper containing the employee and department details.
+     * @throws EmployeeNotFoundException if no employee is found for the given department or if department details are null.
+     * @throws ObjectNotFoundException   if the department corresponding to the provided ID is not found.
+     */
+    public EmployeeDepartmentWrapper getEmployeeWithDepartmentByDepartmentId(long departmentId) {
+        DepartmentDto departmentDto = fetchDepartmentDetails(departmentId);
+        Employee employee = fetchEmployeeByDepartmentId(departmentDto.getDepartmentId());
+        EmployeeDto employeeDto = employeeMapper.mapToEmployeeDto(employee);
+        return new EmployeeDepartmentWrapper(departmentDto, employeeDto);
+    }
+
+    /**
      * Finds an employee by its Email.
      *
      * @param employeeEmail The email of the employee to find.
@@ -81,30 +103,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                     MessageFormat.format(MessageProvider.getMessage("employee.error.email.not_found"), employeeEmail));
         }
         return employeeMapper.mapToEmployeeDto(employee);
-    }
-
-    /**
-     * Retrieves an employee and their associated department information by their ID.
-     *
-     * @param employeeId The ID of the employee to retrieve.
-     * @return An APIResponseDto containing the DTOs representing the employee and their department.
-     * @throws EmployeeNotFoundException if no employee is found with the given ID.
-     */
-    @Override
-    public APIResponseDto getEmployeeWithDepartmentById(Long employeeId) {
-        // Retrieve the employee from the repository
-        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
-        if (optionalEmployee.isEmpty()) {
-            throw new EmployeeNotFoundException(
-                    MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId));
-        }
-        Employee employee = optionalEmployee.get();
-
-        // Retrieve department information using apiClient
-        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
-
-        // Create and populate the response DTO
-        return createAPIResponseDto(employee, departmentDto);
     }
 
     /**
@@ -183,26 +181,34 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * Creates an APIResponseDto from the given employee and department information.
+     * Fetches department details by its ID.
      *
-     * @param employee      The employee to include in the response.
-     * @param departmentDto The department information to include in the response.
-     * @return An APIResponseDto containing the employee and department DTOs.
+     * @param departmentId the ID of the department to fetch details for.
+     * @return the DepartmentDto representing the department details.
+     * @throws ObjectNotFoundException if the department corresponding to the provided ID is not found.
      */
-    private static APIResponseDto createAPIResponseDto(Employee employee, DepartmentDto departmentDto) {
-        EmployeeDto employeeDto = new EmployeeDto(
-                employee.getEmployeeId(),
-                employee.getFirstName(),
-                employee.getLastName(),
-                employee.getEmail(),
-                employee.getDepartmentCode()
-        );
+    private DepartmentDto fetchDepartmentDetails(long departmentId) {
+        ResponseEntity<DepartmentDto> departmentResponse =
+                restTemplate.getForEntity(departmentServiceUrl + departmentId, DepartmentDto.class);
+        if (departmentResponse.getStatusCode() == HttpStatus.OK) {
+            return Optional.ofNullable(departmentResponse.getBody())
+                    .orElseThrow(() -> new ObjectNotFoundException("Department details are null"));
+        } else {
+            throw new ObjectNotFoundException("Department not found");
+        }
+    }
 
-        // Create and populate the response DTO
-        APIResponseDto apiResponseDto = new APIResponseDto();
-        apiResponseDto.setEmployeeDto(employeeDto);
-        apiResponseDto.setDepartmentDto(departmentDto);
-        return apiResponseDto;
+    /**
+     * Fetches an employee by the provided department ID.
+     *
+     * @param departmentId the ID of the department to fetch an employee for.
+     * @return the Employee representing the employee associated with the department.
+     * @throws EmployeeNotFoundException if no employee is found for the given department.
+     */
+    private Employee fetchEmployeeByDepartmentId(long departmentId) {
+        Optional<Employee> employeeOptional = employeeRepository.findById(departmentId);
+        return employeeOptional.orElseThrow(
+                () -> new EmployeeNotFoundException("No employee found for the given department"));
     }
 
 }

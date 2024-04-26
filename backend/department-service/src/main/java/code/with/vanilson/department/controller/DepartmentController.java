@@ -40,8 +40,7 @@ public class DepartmentController {
         return ResponseEntity.ok(departments);
     }
 
-    @GetMapping("/{id}")
-
+    @GetMapping("/id/{id}")
     public ResponseEntity<?> getDepartmentById(@PathVariable("id") long departmentId) {
         try {
             DepartmentDto department = departmentService.findDepartmentById(departmentId);
@@ -50,6 +49,25 @@ public class DepartmentController {
             return exceptionHandlerProvider.handleDepartmentNotFound(ex);
         } catch (DepartmentBadRequestException ex) {
             return exceptionHandlerProvider.handleDepartmentBadRequest(ex);
+        }
+    }
+
+    /**
+     * Retrieves a department by its unique department code.
+     *
+     * @param departmentCode The unique code of the department to retrieve, specified in the path.
+     * @return ResponseEntity with the DTO representation of the department if found.
+     * @throws DepartmentNotFoundException If no department with the given code is found.
+     */
+    @GetMapping("/code/{departmentCode}") // Change "department-code" to "departmentCode"
+    public ResponseEntity<?> getDepartment(@PathVariable("departmentCode") String departmentCode) {
+        try {
+            // Retrieve department by code from the service
+            DepartmentDto departmentDto = departmentService.getDepartmentByCode(departmentCode);
+            return ResponseEntity.ok(departmentDto);
+        } catch (DepartmentNotFoundException ex) {
+            // Handle department not found exception
+            return exceptionHandlerProvider.handleDepartmentNotFound(ex);
         }
     }
 

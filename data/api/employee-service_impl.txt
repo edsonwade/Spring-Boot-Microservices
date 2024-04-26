@@ -1,0 +1,301 @@
+package code.with.vanilson.employee.service;
+
+import code.with.vanilson.employee.dto.APIResponseDto;
+import code.with.vanilson.employee.dto.DepartmentDto;
+import code.with.vanilson.employee.dto.EmployeeDto;
+import code.with.vanilson.employee.exception.EmployeeBadRequestException;
+import code.with.vanilson.employee.exception.EmployeeNotFoundException;
+import code.with.vanilson.employee.exception.EmployeeWithEmailAlreadyExistsException;
+import code.with.vanilson.employee.exception.ObjectNotFoundException;
+import code.with.vanilson.employee.mapper.EmployeeMapper;
+import code.with.vanilson.employee.model.Employee;
+import code.with.vanilson.employee.repository.EmployeeRepository;
+import code.with.vanilson.util.MessageProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+    private final WebClient webClient;
+
+    private final EmployeeMapper employeeMapper;
+
+    private final RestTemplate restTemplate;
+
+    @Value("${department.service.url}")
+    private String departmentServiceUrl;
+
+    private static final String EMPLOYEE_NOT_FOUND_MESSAGE = "employee.error.not_found";
+
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, WebClient webClient,
+                               EmployeeMapper employeeMapper,
+                               RestTemplate restTemplate) {
+        this.employeeRepository = employeeRepository;
+        this.webClient = webClient;
+        this.employeeMapper = employeeMapper;
+        this.restTemplate = restTemplate;
+    }
+
+    /**
+     * Retrieves all employees and maps them to DTOs.
+     *
+     * @return List of EmployeeDto objects representing all employees.
+     */
+    @Override
+    public List<EmployeeDto> findAllEmployees() {
+        List<Employee> employees = employeeRepository.findAll();
+        return employeeMapper.mapEmployeeListToDto(employees);
+    }
+
+    /**
+     * Finds an employee by its ID.
+     *
+     * @param employeeId The ID of the employee to find.
+     * @return The DTO representing the found employee.
+     * @throws EmployeeNotFoundException   if the employee with the given ID is not found.
+     * @throws EmployeeBadRequestException if the provided employee ID is not valid.
+     */
+    @Override
+    public EmployeeDto findEmployeeById(long employeeId) {
+        if (employeeId <= 0) {
+            var errorMessage = MessageProvider.getMessage("employee.error.bad_request", employeeId);
+            throw new EmployeeBadRequestException(errorMessage);
+        }
+        Optional<Employee> employee = employeeRepository.findById(employeeId);
+        return employee.map(employeeMapper::mapToEmployeeDto)
+                .orElseThrow(() -> new EmployeeNotFoundException(
+                        MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId)));
+    }
+//
+//    /**
+//     * Retrieves the employee along with their associated department details by the provided department ID.
+//     *
+//     * @param departmentId the ID of the department to retrieve employee and department details.
+//     * @return an EmployeeDepartmentWrapper containing the employee and department details.
+//     * @throws EmployeeNotFoundException if no employee is found for the given department or if department details are null.
+//     * @throws ObjectNotFoundException   if the department corresponding to the provided ID is not found.
+//     */
+//    public EmployeeDepartmentWrapper getEmployeeWithDepartmentByDepartmentId(long departmentId) {
+//        Employee employee = fetchEmployeeByDepartmentId(departmentId);
+//        DepartmentDto departmentDto = webClient
+//                .get()
+//                .uri(departmentServiceUrl + employee.getDepartmentCode())
+//                .retrieve()
+//                .bodyToMono(DepartmentDto.class)
+//                .block();
+//        EmployeeDto employeeDto = employeeMapper.mapToEmployeeDto(employee);
+//        return new EmployeeDepartmentWrapper(departmentDto, employeeDto);
+//    }
+
+    /**
+     * Finds an employee by its Email.
+     *
+     * @param employeeEmail The email of the employee to find.
+     * @return The DTO representing the found employee.
+     * @throws EmployeeNotFoundException if the employee with the given EMAIL is not found.
+     */
+    @Override
+    public EmployeeDto findEmployeeByEmail(String employeeEmail) {
+        Employee employee = employeeRepository.findEmployeeByEmail(employeeEmail);
+        if (employee == null) {
+            throw new EmployeeNotFoundException(
+                    MessageFormat.format(MessageProvider.getMessage("employee.error.email.not_found"), employeeEmail));
+        }
+        return employeeMapper.mapToEmployeeDto(employee);
+    }
+
+    @Override
+    public APIResponseDto getEmployeeById(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId).get();
+
+        ResponseEntity<DepartmentDto>
+                responseEntity =
+                restTemplate.getForEntity("http://localhost:8080/api/departments/" + employee.getDepartmentCode(),
+                        DepartmentDto.class);
+
+        DepartmentDto departmentDto = responseEntity.getBody();
+
+//        DepartmentDto departmentDto = webClient.get()
+//                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
+//                .retrieve()
+//                .bodyToMono(DepartmentDto.class)
+//                .block();
+//
+//        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
+
+        EmployeeDto employeeDto = new EmployeeDto(
+                employee.getEmployeeId(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getEmail(),
+                employee.getDepartmentCode()
+        );
+
+        APIResponseDto apiResponseDto = new APIResponseDto();
+        apiResponseDto.setEmployeeDto(employeeDto);
+        apiResponseDto.setDepartmentDto(departmentDto);
+
+        return apiResponseDto;
+    }
+
+    /**
+     * Saves an employee based on the provided EmployeeDto.
+     *
+     * @param employeeDto The EmployeeDto containing employee information to be saved.
+     * @return The saved EmployeeDto after persisting the data.
+     * @throws EmployeeWithEmailAlreadyExistsException If an employee with the specified email already exists.
+     */
+    @Override
+    public EmployeeDto saveEmployeeDto(EmployeeDto employeeDto) {
+        validateEmailAndThrowException(employeeDto.getEmail());
+        Employee employee = employeeMapper.mapToEmployeeEntity(employeeDto);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToEmployeeDto(savedEmployee);
+    }
+
+    /**
+     * Updates an employee based on the provided EmployeeDto.
+     *
+     * @param employeeDto The EmployeeDto containing updated employee information.
+     * @return The updated EmployeeDto after saving the changes.
+     * @throws EmployeeNotFoundException               If the employee with the specified ID does not exist.
+     * @throws EmployeeWithEmailAlreadyExistsException If an employee with the specified email already exists.
+     */
+    @Override
+    public EmployeeDto updateEmployeeDto(EmployeeDto employeeDto) {
+        validateEmployeeId(employeeDto.getEmployeeId());
+        validateEmailAndThrowException(employeeDto.getEmail());
+        Employee employee = employeeMapper.mapToEmployeeEntity(employeeDto);
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToEmployeeDto(updatedEmployee);
+    }
+
+    /**
+     * Deletes an employee by its ID.
+     *
+     * @param employeeId The ID of the employee to delete.
+     * @throws EmployeeNotFoundException If the employee with the specified ID does not exist.
+     */
+    @Override
+    public void deleteEmployee(long employeeId) {
+        validateEmployeeId(employeeId);
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new EmployeeNotFoundException(
+                    MessageFormat.format(MessageProvider.getMessage(EMPLOYEE_NOT_FOUND_MESSAGE), employeeId));
+        }
+        employeeRepository.deleteById(employeeId);
+    }
+
+    /**
+     * Validates whether an employee with the given ID exists.
+     *
+     * @param employeeId The ID of the employee to check.
+     * @throws EmployeeNotFoundException   If the employee with the specified ID does not exist.
+     * @throws EmployeeBadRequestException If the provided employee ID is not valid.
+     */
+    private void validateEmployeeId(long employeeId) {
+        if (employeeId <= 0) {
+            String errorMessage = MessageProvider.getMessage("employee.error.bad_request", employeeId);
+            throw new EmployeeBadRequestException(errorMessage);
+        }
+    }
+
+    /**
+     * Validates whether an employee with the given email already exists.
+     *
+     * @param email The email address to check.
+     * @throws EmployeeWithEmailAlreadyExistsException If an employee with the specified email already exists.
+     */
+    private void validateEmailAndThrowException(String email) {
+        if (employeeRepository.existsByEmail(email)) {
+            throw new EmployeeWithEmailAlreadyExistsException(
+                    MessageFormat.format(MessageProvider.getMessage("employee.error.email.conflict_request"), email));
+        }
+    }
+
+/**
+ * Fetches department details by its ID.
+ *
+ * @param departmentId the ID of the department to fetch details for.
+ * @return the DepartmentDto representing the department details.
+ * @throws ObjectNotFoundException if the department corresponding to the provided ID is not found.
+//     */
+//    private DepartmentDto fetchDepartmentDetails(long departmentId) {
+//        ResponseEntity<DepartmentDto> departmentResponse =
+//                webClient.get().uri(departmentServiceUrl + departmentId, DepartmentDto.class);
+//        if (departmentResponse.getStatusCode() == HttpStatus.OK) {
+//            return Optional.ofNullable(departmentResponse.getBody())
+//                    .orElseThrow(() -> new ObjectNotFoundException("Department details are null"));
+//        } else {
+//            throw new ObjectNotFoundException("Department not found");
+//        }
+//    }
+
+/**
+ * Fetches an employee by the provided department ID.
+ *
+ * @param departmentId the ID of the department to fetch an employee for.
+ * @return the Employee representing the employee associated with the department.
+ * @throws EmployeeNotFoundException if no employee is found for the given department.
+ */
+//    private Employee fetchEmployeeByDepartmentId(long departmentId) {
+//        Optional<Employee> employeeOptional = employeeRepository.findById(departmentId);
+//        return employeeOptional.orElseThrow(
+//                () -> new EmployeeNotFoundException("No employee found for the given department"));
+//    }
+
+/**
+ * Fetches an employee by the provided department ID.
+ *
+ * @param departmentId the ID of the department to fetch an employee for.
+ * @return the Employee representing the employee associated with the department.
+ * @throws EmployeeNotFoundException if no employee is found for the given department.
+ */
+    /**
+     * Fetches an employee by the provided department ID.
+     *
+     * @param departmentId the ID of the department to fetch an employee for.
+     * @return the Employee representing the employee associated with the department.
+     * @throws EmployeeNotFoundException if no employee is found for the given department.
+     *                                   //
+     */
+//    private Employee fetchEmployeeByDepartmentId(long departmentId) {
+//        Optional<Employee> employeeOptional = employeeRepository.findById(departmentId);
+//        return employeeOptional.orElseThrow(
+//                () -> new EmployeeNotFoundException("No employee found for the given department"));
+//    }
+    public APIResponseDto getEmployeeWithDepartmentByDepartmentCode(String departmentCode) {
+        Employee employee = fetchEmployeeByDepartmentCode(departmentCode);
+        DepartmentDto departmentDto = webClient
+                .get()
+                .uri(departmentServiceUrl + departmentCode)
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();
+        EmployeeDto employeeDto = employeeMapper.mapToEmployeeDto(employee);
+        return new APIResponseDto(departmentDto, employeeDto);
+    }
+
+    private Employee fetchEmployeeByDepartmentCode(String departmentCode) {
+        List<Employee> employees = employeeRepository.findByDepartmentCode(departmentCode);
+        if (employees.isEmpty()) {
+            throw new EmployeeNotFoundException("No employee found for the given department code");
+        } else if (employees.size() > 1) {
+            // Decide how to handle multiple employees found for the same department code
+            // For example, you could return the first employee found, log a warning, or throw an exception
+            throw new IllegalStateException("Multiple employees found for the given department code");
+        }
+        return employees.get(0);
+    }
+
+}
