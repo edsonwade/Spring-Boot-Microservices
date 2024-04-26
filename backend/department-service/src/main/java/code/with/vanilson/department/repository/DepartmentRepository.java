@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query("SELECT d FROM Department d WHERE d.departmentCode = :departmentCode")
-    Department findByDepartmentCode(@Param("departmentCode") String departmentCode);
+    Department findByDepartmentCodeIgnoreCase(@Param("departmentCode") String departmentCode);
 
 }

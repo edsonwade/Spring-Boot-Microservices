@@ -134,7 +134,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentDto getDepartmentByCode(String departmentCode) {
-        Department department = departmentRepository.findByDepartmentCode(departmentCode);
+        Department department = departmentRepository.findByDepartmentCodeIgnoreCase(departmentCode);
         if (Objects.nonNull(department)) {
             return new DepartmentDto(
                     department.getDepartmentId(),
