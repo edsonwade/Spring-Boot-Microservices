@@ -1,0 +1,8 @@
+#global:
+#  scrape_interval:     15s # How frequently to scrape targets by default
+#  evaluation_interval: 15s # How frequently to evaluate rules by default
+#
+#scrape_configs:
+#  - job_name: 'eureka-service-registry'
+#    static_configs:
+#      - targets: ['host.docker.internal:service-registry:8761']  # Replace with your actual host

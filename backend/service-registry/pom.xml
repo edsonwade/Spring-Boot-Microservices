@@ -4,28 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>vanilson.code</groupId>
-        <artifactId>springify-service</artifactId>
+        <groupId>code.with.vanilson</groupId>
+        <artifactId>backend</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
-    <groupId>code.with.vanilson</groupId>
-    <artifactId>backend</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>department-service</module>
-        <module>employee-service</module>
-        <module>service-registry</module>
-    </modules>
-
     <properties>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
     </properties>
+
+    <artifactId>service-registry</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>code.with.vanilson</groupId>
-            <artifactId>common</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
+
     </dependencies>
+
 
 </project>
