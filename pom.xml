@@ -23,6 +23,8 @@
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
         <mockito.version>5.11.0</mockito.version>
     </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,7 +84,7 @@
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>5.9.0</version>
+            <version>5.11.0-M1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -106,6 +108,8 @@
             <version>${mockito.version}</version>
         </dependency>
     </dependencies>
+
+
 
     <dependencyManagement>
         <dependencies>
@@ -147,6 +151,14 @@
                 <groupId>code.with.vanilson</groupId>
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-parent</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
