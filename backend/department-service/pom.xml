@@ -9,10 +9,12 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
+    </properties>
+
     <artifactId>department-service</artifactId>
 
-    <properties>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -23,7 +25,14 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version> <!-- Specify the version you want to use -->
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
     </dependencies>
+
+
     <repositories>
         <repository>
             <id>maven_central</id>
