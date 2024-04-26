@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DepartmentServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="POSTGRES_USERNAME" value="postgres" />
+      <env name="POSTGRES_PASSWORD" value="Janina1." />
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <module name="department-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="code.with.vanilson.DepartmentServiceApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="code.with.vanilson.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

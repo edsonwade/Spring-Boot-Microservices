@@ -21,20 +21,12 @@
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.3</spring-cloud.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
+        <mockito.version>5.11.0</mockito.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.2</version> <!-- Specify the version you want to use -->
         </dependency>
 
         <dependency>
@@ -61,8 +53,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <!--<version>2.0.0.RELEASE</version>-->
         </dependency>
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -101,17 +93,17 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.25.3</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.6.1</version>
+            <version>${mockito.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>4.6.1</version>
+            <version>${mockito.version}</version>
         </dependency>
     </dependencies>
 
@@ -147,10 +139,23 @@
 
             <dependency>
                 <groupId>code.with.vanilson</groupId>
+                <artifactId>service-registry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>code.with.vanilson</groupId>
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+    </repositories>
 
 </project>
