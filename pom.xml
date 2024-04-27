@@ -152,6 +152,11 @@
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>code.with.vanilson</groupId>
+                <artifactId>config-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>code.with.vanilson</groupId>
