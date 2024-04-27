@@ -3,9 +3,9 @@ global:
   evaluation_interval: 15s # How frequently to evaluate rules by default
 
 scrape_configs:
-  - job_name: 'eureka-service-registry'
+  - job_name: 'gateway-service'
     static_configs:
-      - targets: [ 'host.docker.internal:service-registry:8761' ]  # Replace with your actual host
+      - targets: [ 'host.docker.internal:EMPLOYEE-SERVICE:8081' ]  # Replace with your actual host
 
   - job_name: 'actuator'
     metrics_path: '/actuator/prometheus'

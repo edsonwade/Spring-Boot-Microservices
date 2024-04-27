@@ -1,40 +1,49 @@
 spring:
   application:
     name: DEPARTMENT-SERVICE
-  config:
-    import: optional:configserver:http://localhost:8888
-#  springdoc:
-#    api-docs:
-#      path: /api-docs
-#
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/department_service
-#    username: ${POSTGRES_USERNAME}
-#    password: ${POSTGRES_PASSWORD}
-#    driver-class-name: org.postgresql.Driver
-#  jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-#    instance:
-#      preferIpAddress: true
-#
-#server:
-#  port: 8082
-#
-#springdoc:
-#  api-docs:
-#    path: /api-docs
-#  swagger-ui:
-#    path: /swagger-ui-custom.html
-#
-#springfox:
-#  documentation:
-#    swagger-ui:
-#      enabled: true
+  springdoc:
+    api-docs:
+      path: /api-docs
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/department_service
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    instance:
+      preferIpAddress: true
+
+server:
+  port: 8082
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true

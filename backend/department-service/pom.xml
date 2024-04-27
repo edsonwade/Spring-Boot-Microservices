@@ -27,10 +27,9 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
+            <groupId>code.with.vanilson</groupId>
+            <artifactId>common</artifactId>
         </dependency>
     </dependencies>
 

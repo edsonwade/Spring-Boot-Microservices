@@ -16,21 +16,21 @@ public class EmployeeExceptionHandler implements CommonExceptionHandler {
     @Override
     public ResponseEntity<ErrorResponse> handleNotFoundException(String ex) {
         ErrorResponse errorResponse =
-                new ErrorResponse(ex, NOT_FOUND_HTTP_STATUS, PORTUGAL_LISBON, NOT_FOUND);
+                new ErrorResponse(ex, NOT_FOUND_HTTP_STATUS, PORTUGAL_LISBON, NOT_FOUND,LOCAL_DATE_TIME);
         return new ResponseEntity<>(errorResponse, NOT_FOUND_HTTP_STATUS);
     }
 
     @Override
     public ResponseEntity<ErrorResponse> handleBadRequestException(String ex) {
         ErrorResponse errorResponse =
-                new ErrorResponse(ex, BAD_REQUEST_STATUS, UK_LONDON, BAD_REQUEST);
+                new ErrorResponse(ex, BAD_REQUEST_STATUS, UK_LONDON, BAD_REQUEST,LOCAL_DATE_TIME);
         return new ResponseEntity<>(errorResponse, BAD_REQUEST_STATUS);
     }
 
     @Override
     public ResponseEntity<ErrorResponse> handleConflictRequestException(String ex) {
         ErrorResponse errorResponse =
-                new ErrorResponse(ex, CONFLICT_HTTP_STATUS, PORTUGAL_LISBON, CONFLICT);
+                new ErrorResponse(ex, CONFLICT_HTTP_STATUS, PORTUGAL_LISBON, CONFLICT,LOCAL_DATE_TIME);
         return new ResponseEntity<>(errorResponse, CONFLICT_HTTP_STATUS);
     }
 }

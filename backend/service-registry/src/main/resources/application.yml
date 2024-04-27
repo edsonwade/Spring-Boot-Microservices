@@ -8,3 +8,8 @@ eureka:
     registerWithEureka: true  # Enable registration with Eureka
     fetchRegistry: true       # Enable fetching registry information from Eureka
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
