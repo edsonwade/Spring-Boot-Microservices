@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: gateway-service
+  main:
+    web-application-type: reactive
+
+  ### Routes for Employee Service
+  cloud:
+    gateway:
+      routes:
+        - id: EMPLOYEE-SERVICE   # Unique identifier for this route
+          uri: lb://EMPLOYEE-SERVICE  # Target URI for the route, load-balanced to 'employee-service' or could be
+          predicates:
+            - Path=/api/employees/**   # Predicate to match requests with paths starting with '/employee/'
+
+            ### Routes for Department Service
+        - id: DEPARTMENT-SERVICE   # Unique identifier for the route
+          uri: lb://DEPARTMENT-SERVICE  # Target URI for the route, load-balanced to 'department-service'
+          predicates:
+            - Path=/api/departments/**   # Predicate to match requests with paths starting with '/api/departments/'
+
+management:
+  endpoints:
+    web:
+      exposure-include: "*"   # Expose all endpoints over the web
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+server:
+  port: 9191   # Port number on which the Gateway will listen for incoming requests

@@ -54,7 +54,8 @@ The goal of Springify is to provide developers with a hands-on approach to maste
 - **SpringDoc OpenAPI (Swagger) Library**: A library for generating API documentation directly from Spring MVC endpoints.
 
 With Springify, dive into the world of Spring Boot and microservices development, and elevate your skills to build scalable and resilient applications! 🚀
-
+### spring boot version 3 xxx 
+On this version you dont need to use annotation **@EnableEurekaClient** only on versions 2xx.
 ## Contribution 🤝
 Contributions to Springify are welcomed! If you have any improvements, additional features, or bug fixes, feel free to submit a pull request.
 
