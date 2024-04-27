@@ -17,16 +17,17 @@
         <module>employee-service</module>
         <module>service-registry</module>
         <module>gateway-service</module>
+        <module>common</module>
     </modules>
 
     <properties>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>code.with.vanilson</groupId>
-            <artifactId>common</artifactId>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>code.with.vanilson</groupId>-->
+<!--            <artifactId>common</artifactId>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
 </project>

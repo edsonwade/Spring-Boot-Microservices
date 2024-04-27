@@ -25,6 +25,10 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version> <!-- Specify the version you want to use -->
         </dependency>
+        <dependency>
+            <groupId>code.with.vanilson</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
     </dependencies>
 
 
