@@ -9,9 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <spring-cloud.version>2022.0.3</spring-cloud.version>
-    </properties>
 
     <artifactId>department-service</artifactId>
 

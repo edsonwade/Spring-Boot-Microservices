@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.4</version>
+        <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>vanilson.code</groupId>
@@ -19,7 +19,7 @@
     </modules>
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2022.0.3</spring-cloud.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
         <mockito.version>5.11.0</mockito.version>
     </properties>
@@ -150,6 +150,12 @@
             <dependency>
                 <groupId>code.with.vanilson</groupId>
                 <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>code.with.vanilson</groupId>
+                <artifactId>gateway-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
