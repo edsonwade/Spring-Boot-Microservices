@@ -56,6 +56,53 @@ The goal of Springify is to provide developers with a hands-on approach to maste
 With Springify, dive into the world of Spring Boot and microservices development, and elevate your skills to build scalable and resilient applications! 🚀
 ### spring boot version 3 xxx 
 On this version you dont need to use annotation **@EnableEurekaClient** only on versions 2xx.
+
+## enable automatically api gateway
+Its create automatically routes.
+````bash
+### Return the employee with the associate departments we need to provide employee-service
+GET http://localhost:9191/employee-service/api/employees/departments/2
+
+### api gateway route departments service
+GET http://localhost:9191/department-service/api/departments/code/MKT
+````
+### Config api gateway properties
+````bash
+spring:
+  application:
+    name: GATEWAY-SERVICE
+  main:
+    web-application-type: reactive
+
+  ### Routes for Employee Service
+  cloud:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+### Automatically create route gateway
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway:
+            handler:
+              RoutePredicateHandlerMapping: debug
+          
+management:
+  endpoints:
+    web:
+      exposure-include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+server:
+  port: 9191   # Port number on which the Gateway will listen for incoming requests
+````
 ## Contribution 🤝
 Contributions to Springify are welcomed! If you have any improvements, additional features, or bug fixes, feel free to submit a pull request.
 
