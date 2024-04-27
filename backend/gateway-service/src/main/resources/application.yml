@@ -1,28 +1,31 @@
 spring:
   application:
-    name: gateway-service
+    name: GATEWAY-SERVICE
   main:
     web-application-type: reactive
 
   ### Routes for Employee Service
   cloud:
     gateway:
-      routes:
-        - id: EMPLOYEE-SERVICE   # Unique identifier for this route
-          uri: lb://EMPLOYEE-SERVICE  # Target URI for the route, load-balanced to 'employee-service' or could be
-          predicates:
-            - Path=/api/employees/**   # Predicate to match requests with paths starting with '/employee/'
-
-            ### Routes for Department Service
-        - id: DEPARTMENT-SERVICE   # Unique identifier for the route
-          uri: lb://DEPARTMENT-SERVICE  # Target URI for the route, load-balanced to 'department-service'
-          predicates:
-            - Path=/api/departments/**   # Predicate to match requests with paths starting with '/api/departments/'
-
+#      routes:
+#        - id: EMPLOYEE-SERVICE   # Unique identifier for this route
+#          uri: lb://EMPLOYEE-SERVICE  # Target URI for the route, load-balanced to 'employee-service' or could be
+#          predicates:
+#            - Path=/api/employees/**   # Predicate to match requests with paths starting with '/employee/'
+#
+#            ### Routes for Department Service
+#        - id: DEPARTMENT-SERVICE   # Unique identifier for the route
+#          uri: lb://DEPARTMENT-SERVICE  # Target URI for the route, load-balanced to 'department-service'
+#          predicates:
+#            - Path=/api/departments/**   # Predicate to match requests with paths starting with '/api/departments/'
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
 management:
   endpoints:
     web:
-      exposure-include: "*"   # Expose all endpoints over the web
+      exposure-include: "*"
   endpoint:
     health:
       show-details: always
@@ -31,3 +34,13 @@ management:
 
 server:
   port: 9191   # Port number on which the Gateway will listen for incoming requests
+
+### Automatically create route gateway
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway:
+            handler:
+              RoutePredicateHandlerMapping: debug
