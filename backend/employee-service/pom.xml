@@ -25,10 +25,6 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version> <!-- Specify the version you want to use -->
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
     </dependencies>
 
 

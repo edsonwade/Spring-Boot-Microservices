@@ -12,23 +12,20 @@ services:
     ports:
       - "8082:8082"
     environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: your_postgres_username
+      POSTGRES_PASSWORD: your_postgres_password
       EUREKA_URI: http://eureka-service:8761/eureka
     depends_on:
       - eureka-service
     networks:
       - app-network
-    restart: unless-stopped
     volumes:
       - department-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health | grep '\"status\":\"UP\"'" ]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health | grep '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
       retries: 3
-
   department-service-2:
     image: department-service:latest
     build:
@@ -36,15 +33,13 @@ services:
     ports:
       - "8083:8082"  # Second instance running on port 8083
     environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: your_postgres_username
+      POSTGRES_PASSWORD: your_postgres_password
       EUREKA_URI: http://eureka-service:8761/eureka
     depends_on:
       - eureka-service
     networks:
       - app-network
-    restart: unless-stopped
     volumes:
       - department-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -60,23 +55,20 @@ services:
     ports:
       - "8081:8081"
     environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: your_postgres_username
+      POSTGRES_PASSWORD: your_postgres_password
       EUREKA_URI: http://eureka-service:8761/eureka
     depends_on:
       - eureka-service
     networks:
       - app-network
-    restart: unless-stopped
     volumes:
       - employee-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health | grep '\"status\":\"UP\"'" ]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health | grep '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
       retries: 3
-
   employee-service-1:
     image: employee-service:latest
     build:
@@ -84,15 +76,13 @@ services:
     ports:
       - "8084:8081"  # Third instance running on port 8084
     environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: your_postgres_username
+      POSTGRES_PASSWORD: your_postgres_password
       EUREKA_URI: http://eureka-service:8761/eureka
     depends_on:
       - eureka-service
     networks:
       - app-network
-    restart: unless-stopped
     volumes:
       - employee-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -100,7 +90,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
   gateway-service:
     image: gateway-service:latest
     build:
@@ -113,9 +102,8 @@ services:
       - eureka-service
     networks:
       - app-network
-    restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:9191/actuator/health | grep '\"status\":\"UP\"'" ]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9191/actuator/health | grep '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -129,7 +117,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep '\"status\":\"UP\"'" ]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -144,7 +132,6 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
       - app-network
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -152,34 +139,7 @@ services:
       - "3000:3000"
     networks:
       - app-network
-    restart: unless-stopped
 
-  department-postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: department_db
-      POSTGRES_USER: your_department_postgres_username
-      POSTGRES_PASSWORD: your_department_postgres_password
-    ports:
-      - "5432:5432"  # Custom port mapping for department-postgres
-    volumes:
-      - department-db-data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  employee-postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USER: your_employee_postgres_username
-      POSTGRES_PASSWORD: your_employee_postgres_password
-    ports:
-      - "5433:5432"  # Custom port mapping for employee-postgres
-    volumes:
-      - employee-db-data:/var/lib/postgresql/data
-    networks:
-      - app-network
 
 networks:
-  mindswap-net:
-    driver: bridge
+  app-network:

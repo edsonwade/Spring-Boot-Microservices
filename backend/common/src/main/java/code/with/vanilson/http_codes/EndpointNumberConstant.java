@@ -1,5 +1,7 @@
 package code.with.vanilson.http_codes;
 
+import java.time.LocalDateTime;
+
 public final class EndpointNumberConstant {
 
     // HTTP Status Codes
@@ -42,6 +44,10 @@ public final class EndpointNumberConstant {
     public static final int DEFAULT_HTTPS_PORT = 8443;
     public static final int DEFAULT_DATABASE_PORT = 3306;
     public static final int DEFAULT_REDIS_PORT = 6379;
+
+    // Time Endpoint
+
+    public static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
 
     // Private constructor to prevent instantiation
     private EndpointNumberConstant() {
